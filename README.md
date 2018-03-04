@@ -4,7 +4,7 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 ## Work Log
 * 168: Project created on GitHub
 * 167: Initial project structure cribbed from 7DRL 2015
-* Break: Daughter Taxi
+* 163: Hints of ECS; change of programming venue
 
 ## Thanks
 * Mike Koenig for [Martian Scanner](http://soundbible.com/878-Martian-Scanner.html) sound effect

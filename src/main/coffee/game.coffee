@@ -15,16 +15,31 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
+{World} = require "index-ecs"
+
 audio = require "./audio"
 
-playAmbienceEffects = ->
-  audio.play "crash-large"
-  # TODO: This timeout can be handled with Promises; do that instead
-  setTimeout (-> audio.play "martian-scanner"), 5000
+world = null
+
+preFlightChecks = ->
+  return "rot.js is not supported" if not ROT.isSupported()
+  return null
 
 exports.run = ->
-  console.log "Game begins!"
-  playAmbienceEffects()
+  # if there is any trouble
+  reason = preFlightChecks()
+  return alert reason if reason?
+  # set the random seed
+  seed = Date.now()
+  ROT.RNG.setSeed seed
+  console.log "Game begins with seed #{seed}!"
+  # create the World so we can start populating it
+  world = new World()
+  console.log "Good bye cruel world!"
+
+# debugging in browser
+exports.world = world
+window.API.game = exports if window?.API?
 
 #----------------------------------------------------------------------
 # end of game.coffee

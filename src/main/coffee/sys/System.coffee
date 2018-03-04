@@ -1,4 +1,4 @@
-# tda616-test.coffee
+# System.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,18 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-should = require "should"
+class System
+  constructor: (@world) ->
 
-describe "tda616", ->
-  it "should obey the laws of logic", ->
-    false.should.equal false
-    true.should.equal true
+  run: ->
+    console.log "System.run() is a no-op"
 
-  it "should play some sound effects sometimes", ->
-    playAmbienceEffects = ->
-      audio.play "crash-large"
-      # TODO: This timeout can be handled with Promises; do that instead
-      setTimeout (-> audio.play "martian-scanner"), 5000
+exports.System = System
 
 #----------------------------------------------------------------------
-# end of tda616-test.coffee
+# end of System.coffee

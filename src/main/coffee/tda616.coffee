@@ -18,12 +18,8 @@
 audio = require "./audio"
 game = require "./game"
 
-loadResources = ->
-  loaded = await audio.loadResources()
-  return loaded
-
 exports.run = ->
-  loaded = await loadResources()
+  loaded = await audio.loadResources()
   game.run()
 
 #----------------------------------------------------------------------

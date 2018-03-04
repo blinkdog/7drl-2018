@@ -1,4 +1,4 @@
-# tda616-test.coffee
+# Position.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,18 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-should = require "should"
-
-describe "tda616", ->
-  it "should obey the laws of logic", ->
-    false.should.equal false
-    true.should.equal true
-
-  it "should play some sound effects sometimes", ->
-    playAmbienceEffects = ->
-      audio.play "crash-large"
-      # TODO: This timeout can be handled with Promises; do that instead
-      setTimeout (-> audio.play "martian-scanner"), 5000
+class Position
+  constructor: ->
+    @x = 0
+    @y = 0
+    @z = 0
 
 #----------------------------------------------------------------------
-# end of tda616-test.coffee
+# end of Position.coffee
