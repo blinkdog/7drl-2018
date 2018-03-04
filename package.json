@@ -1,0 +1,33 @@
+{
+  "name": "tda616",
+  "version": "0.0.1",
+  "author": "Patrick Meade <veloxi@ticon.net>",
+  "description": "Seven Day Roguelike (7DRL) Challenge 2018",
+  "scripts": {
+    "start": "google-chrome --new-tab tda616.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blinkdog/7drl-2018.git"
+  },
+  "keywords": [
+    "7DRL",
+    "coffeescript",
+    "game",
+    "html5",
+    "javascript",
+    "rogue",
+    "roguelike",
+    "rot",
+    "rot.js"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "browserify": "16.1.0",
+    "coffeescript": "2.2.2",
+    "istanbul": "0.4.5",
+    "mocha": "5.0.1",
+    "should": "13.2.1"
+  },
+  "license": "AGPL-3.0"
+}

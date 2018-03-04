@@ -57,3 +57,10 @@ typings/
 # dotenv environment variables file
 .env
 
+# 7drl-2018 project specifics
+/coverage
+/lib
+/node_modules
+/test
+/tda616.js
+/tda616*.tar.gz
