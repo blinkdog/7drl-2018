@@ -15,6 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
+DISPLAY_SIZE =
+  WIDTH: 80
+  HEIGHT: 25
+
 _ = require "lodash"
 {System} = require "./System"
 
@@ -25,13 +29,27 @@ act = (world) ->
   createDisplay() if not display?
   # clear the display to get ready for a new drawing cycle
   display.clear()
+  # DEBUG: Fill the grid with magic pink hashes
+  for y in [0...25]
+    for x in [0...80]
+      display.draw x, y, "#", "#f0f", "#000"
   # find everything that we can draw
   ents = world.find [ "glyph", "position" ]
   # TODO: may need to sort these ents by Z value (painter's algorithm)
   for ent in ents
     # draw everything that we can draw
     display.draw ent.position.x, ent.position.y, ent.glyph.ch, ent.glyph.fg, ent.glyph.bg
+  # clear some lines for status and messages
+  for y in [DISPLAY_SIZE.HEIGHT-5...DISPLAY_SIZE.HEIGHT-1]
+    clearLine y, "#000"
+  clearLine DISPLAY_SIZE.HEIGHT-1, "#fff"
   # return something reasonable to the caller
+  return true
+
+clearLine = (y, bg) ->
+  bg ?= "#000"
+  for x in [0...DISPLAY_SIZE.WIDTH]
+    display.draw x, y, "", "#fff", bg
   return true
 
 createDisplay = (world) ->

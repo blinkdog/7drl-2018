@@ -1,4 +1,4 @@
-# creator.coffee
+# Messages.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,24 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{Glyph} = require "./comp/Glyph"
-{Messages} = require "./comp/Messages"
-{Player} = require "./comp/Player"
-{Position} = require "./comp/Position"
-
-exports.create = (world) ->
-  # create the messages log
-  ent = world.createEntity()
-  messages = new Messages()
-  world.addComponent ent, "messages", messages
-  # create our protagonist
-  ent = world.createEntity()
-  player = new Player "Fred Bloggs"
-  world.addComponent ent, "player", player
-  glyph = new Glyph "@"
-  world.addComponent ent, "glyph", glyph
-  position = new Position 40, 12
-  world.addComponent ent, "position", position
+class exports.Messages
+  constructor: ->
+    @log = []
 
 #----------------------------------------------------------------------
-# end of creator.coffee
+# end of Messages.coffee
