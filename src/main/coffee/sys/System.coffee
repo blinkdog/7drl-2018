@@ -15,13 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-class System
+class exports.System
   constructor: (@world) ->
-
-  run: ->
-    console.log "System.run() is a no-op"
-
-exports.System = System
+  run: -> console.log "System.run() is a no-op"
 
 #----------------------------------------------------------------------
 # end of System.coffee

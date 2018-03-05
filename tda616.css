@@ -17,15 +17,17 @@
   */
 
 body {
-    background-color: #000;
-    font-family: droid sans mono, monospace;
-    font-size: 16px;
-    margin: 0;
+  background-color: #222;
+  font-family: droid sans mono, monospace;
+  font-size: 16px;
+  margin: 0;
 }
 
 canvas {
-    display: block;
-    margin: auto;
+  display: block;
+  height: 100%;
+  margin: auto;
+  width: 100%;
 }
 
 /* end of tda616.css */

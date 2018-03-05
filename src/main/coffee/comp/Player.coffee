@@ -1,4 +1,4 @@
-# Display.coffee
+# Player.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,14 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{System} = require "./System"
-
-class Display extends System
-  run: ->
-    console.log "Displaying all entities..."
-    entities = @world.findAll()
-    for entity in entities
-      console.log entity
+class exports.Player
+  constructor: (@name) ->
+    @name = "Hero" if not @name?
 
 #----------------------------------------------------------------------
-# end of Display.coffee
+# end of Player.coffee

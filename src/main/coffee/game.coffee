@@ -18,8 +18,38 @@
 {World} = require "index-ecs"
 
 audio = require "./audio"
+creator = require "./creator"
 
+{DrawingSystem} = require "./sys/DrawingSystem"
+{InputSystem} = require "./sys/InputSystem"
+
+drawingSystem = null
+inputSystem = null
 world = null
+
+loopAgain = false
+loopRunning = false
+
+exports.next = ->
+  if loopRunning
+    loopAgain = true
+  else
+    loopRunning = true
+    setTimeout (-> mainLoop()), 1
+
+mainLoop = ->
+  # raise the loop flag
+  loopRunning = true
+  # TODO: Run the game's main loop here
+  inputSystem.run()
+  drawingSystem.run()
+  # drop the loop flag
+  loopRunning = false
+  # if something set the loop again flag, do that
+  if loopAgain
+    loopAgain = false
+    loopRunning = true
+    setTimeout (-> mainLoop()), 1
 
 preFlightChecks = ->
   return "rot.js is not supported" if not ROT.isSupported()
@@ -35,7 +65,11 @@ exports.run = ->
   console.log "Game begins with seed #{seed}!"
   # create the World so we can start populating it
   world = new World()
-  console.log "Good bye cruel world!"
+  creator.create world
+  drawingSystem = new DrawingSystem world
+  inputSystem = new InputSystem world
+  # run the main loop
+  mainLoop()
 
 # debugging in browser
 exports.world = world

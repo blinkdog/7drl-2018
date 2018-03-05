@@ -15,11 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-class Position
-  constructor: ->
-    @x = 0
-    @y = 0
-    @z = 0
+class exports.Position
+  constructor: (@x, @y, @z) ->
+    @x = 0 if not @x?
+    @y = 0 if not @y?
+    @z = 0 if not @z?
 
 #----------------------------------------------------------------------
 # end of Position.coffee

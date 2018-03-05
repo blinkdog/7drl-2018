@@ -5,6 +5,7 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 * 168: Project created on GitHub
 * 167: Initial project structure cribbed from 7DRL 2015
 * 163: Hints of ECS; change of programming venue
+* 160: @ walking around the empty screen demo
 
 ## Thanks
 * Mike Koenig for [Martian Scanner](http://soundbible.com/878-Martian-Scanner.html) sound effect

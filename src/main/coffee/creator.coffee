@@ -1,4 +1,4 @@
-# StationLevelMap.coffee
+# creator.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-# TODO: Getting a little ahead of myself here; just too excited! :-)
-class exports.StationLevelMap
-  constructor: ->
-    @map = new ROT.Map.Digger()
-    @map.getRooms()
+{Glyph} = require "./comp/Glyph"
+{Player} = require "./comp/Player"
+{Position} = require "./comp/Position"
+
+exports.create = (world) ->
+  # create our protagonist
+  ent = world.createEntity()
+  player = new Player "Fred Bloggs"
+  world.addComponent ent, "player", player
+  glyph = new Glyph "@"
+  world.addComponent ent, "glyph", glyph
+  position = new Position 40, 12
+  world.addComponent ent, "position", position
 
 #----------------------------------------------------------------------
-# end of StationLevelMap.coffee
+# end of creator.coffee
