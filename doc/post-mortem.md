@@ -8,7 +8,18 @@ a playable RL for 7DRL 2018.
 
 http://www.roguebasin.com/index.php?title=How_to_Write_a_Roguelike_in_15_Steps
 
+Yeah, StationLevelMap got deleted; entities are intended to be
+more fine grained than this. Being able to get rooms, corridors,
+and doors is nice.
+
 ## Browser objects
 Are not world entities, trying to make them such is just a painful
 extra layer. Stripping that crap away in DisplaySystem for simplicity
 was much nicer.
+
+## Destructured Helpers
+This turns out to be really nice. If a helper function returns an
+entity, then destructuring can pick out all the components that
+we want to access.
+
+    {room} = helper.getNearestRoom 0, STATION_SIZE.HEIGHT, STATION_SIZE.LEVELS

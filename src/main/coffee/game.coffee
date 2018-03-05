@@ -19,6 +19,7 @@
 
 audio = require "./audio"
 creator = require "./creator"
+helper = require "./helper"
 
 {DrawingSystem} = require "./sys/DrawingSystem"
 {InputSystem} = require "./sys/InputSystem"
@@ -65,6 +66,7 @@ exports.run = ->
   console.log "Game begins with seed #{seed}!"
   # create the World so we can start populating it
   world = new World()
+  helper.setWorld world
   creator.create world
   drawingSystem = new DrawingSystem world
   inputSystem = new InputSystem world

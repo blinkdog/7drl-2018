@@ -15,6 +15,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
+STATION_SIZE =
+  WIDTH: 80
+  HEIGHT: 25
+  LEVELS: 100
+
+helper = require "./helper"
+
+{Corridor} = require "./comp/Corridor"
+{Door} = require "./comp/Door"
+{Room} = require "./comp/Room"
 {Glyph} = require "./comp/Glyph"
 {Messages} = require "./comp/Messages"
 {Player} = require "./comp/Player"
@@ -25,13 +35,43 @@ exports.create = (world) ->
   ent = world.createEntity()
   messages = new Messages()
   world.addComponent ent, "messages", messages
+
+  # create the station layout
+  for i in [1..STATION_SIZE.LEVELS]
+    map = new ROT.Map.Digger STATION_SIZE.WIDTH, STATION_SIZE.HEIGHT
+    map.create()
+    # create a room entity for each room
+    for room in map.getRooms()
+      ent = world.createEntity()
+      roomComp = new Room room.getLeft(), room.getTop(), room.getRight(), room.getBottom(), i
+      world.addComponent ent, "room", roomComp
+      glyph = new Glyph ".", "#777", "#000"
+      world.addComponent ent, "glyph", glyph
+      # create a door entity for each door
+      room.getDoors (x, y) ->
+        ent = world.createEntity()
+        door = new Door x, y, i
+        world.addComponent ent, "door", door
+        glyph = new Glyph "Z", "#777", "#000"
+        world.addComponent ent, "glyph", glyph
+    # create a corridor entity for each corridor
+    for corridor in map.getCorridors()
+      ent = world.createEntity()
+      corridorComp = new Corridor corridor._startX, corridor._startY, corridor._endX, corridor._endY, i
+      world.addComponent ent, "corridor", corridorComp
+      glyph = new Glyph ".", "#777", "#000"
+      world.addComponent ent, "glyph", glyph
+
   # create our protagonist
   ent = world.createEntity()
   player = new Player "Fred Bloggs"
   world.addComponent ent, "player", player
   glyph = new Glyph "@"
   world.addComponent ent, "glyph", glyph
-  position = new Position 40, 12
+  {room} = helper.getNearestRoom 0, STATION_SIZE.HEIGHT, STATION_SIZE.LEVELS
+  roomX = Math.floor (room.x1+room.x2) / 2
+  roomY = Math.floor (room.y1+room.y2) / 2
+  position = new Position roomX, roomY, STATION_SIZE.LEVELS
   world.addComponent ent, "position", position
 
 #----------------------------------------------------------------------

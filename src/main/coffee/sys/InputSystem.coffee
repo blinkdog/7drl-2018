@@ -52,13 +52,13 @@ handleWalk = (world, vk) ->
   for ent in ents
     switch vk
       when "VK_UP"
-        ent.position.y = Math.max 0, ent.position.y-1
+        ent.position.y = Math.max -50, ent.position.y-1
       when "VK_DOWN"
-        ent.position.y = Math.min 24, ent.position.y+1
+        ent.position.y = Math.min 100, ent.position.y+1
       when "VK_LEFT"
-        ent.position.x = Math.max 0, ent.position.x-1
+        ent.position.x = Math.max -50, ent.position.x-1
       when "VK_RIGHT"
-        ent.position.x = Math.min 79, ent.position.x+1
+        ent.position.x = Math.min 100, ent.position.x+1
 
 class exports.InputSystem extends System
   run: -> act @world
