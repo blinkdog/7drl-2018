@@ -7,6 +7,7 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 * 163: Hints of ECS; change of programming venue
 * 160: @ walking around the empty screen demo
 * 158: Empty message and status lines
+* 152: Useful message lines and non-empty status line
 
 ## Thanks
 * Mike Koenig for [Martian Scanner](http://soundbible.com/878-Martian-Scanner.html) sound effect

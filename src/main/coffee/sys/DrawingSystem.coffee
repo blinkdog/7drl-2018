@@ -17,7 +17,9 @@
 
 DISPLAY_SIZE =
   WIDTH: 80
-  HEIGHT: 25
+  HEIGHT: 30
+
+MESSAGE_HEIGHT = 4
 
 _ = require "lodash"
 {System} = require "./System"
@@ -27,22 +29,12 @@ display = null
 act = (world) ->
   # first, ensure that we've got a display
   createDisplay() if not display?
-  # clear the display to get ready for a new drawing cycle
+  # draw everything that needs to be drawn
   display.clear()
-  # DEBUG: Fill the grid with magic pink hashes
-  for y in [0...25]
-    for x in [0...80]
-      display.draw x, y, "#", "#f0f", "#000"
-  # find everything that we can draw
-  ents = world.find [ "glyph", "position" ]
-  # TODO: may need to sort these ents by Z value (painter's algorithm)
-  for ent in ents
-    # draw everything that we can draw
-    display.draw ent.position.x, ent.position.y, ent.glyph.ch, ent.glyph.fg, ent.glyph.bg
-  # clear some lines for status and messages
-  for y in [DISPLAY_SIZE.HEIGHT-5...DISPLAY_SIZE.HEIGHT-1]
-    clearLine y, "#000"
-  clearLine DISPLAY_SIZE.HEIGHT-1, "#fff"
+  drawDebugPattern()
+  drawMap world
+  drawMessages world
+  drawStatusLine world
   # return something reasonable to the caller
   return true
 
@@ -53,17 +45,61 @@ clearLine = (y, bg) ->
   return true
 
 createDisplay = (world) ->
-  console.log "Creating ROT.Display (80x25)"
+  console.log "Creating ROT.Display (#{DISPLAY_SIZE.WIDTH}x#{DISPLAY_SIZE.HEIGHT})"
   # create the display and add it to the world
   display = new ROT.Display
     layout: "rect"
-    width: 80
-    height: 25
+    width: DISPLAY_SIZE.WIDTH
+    height: DISPLAY_SIZE.HEIGHT
   # add the display to the browser
   document.body.innerHTML = ''
   document.body.appendChild display.getContainer()
   # return something reasonable to the caller
   return display
+
+# DEBUG: Fill the grid with magic pink hashes
+drawDebugPattern = ->
+  for y in [0...DISPLAY_SIZE.HEIGHT]
+    for x in [0...DISPLAY_SIZE.WIDTH]
+      display.draw x, y, "#", "#f0f", "#000"
+
+drawMap = (world) ->
+  # find everything that we can draw
+  ents = world.find [ "glyph", "position" ]
+  # TODO: may need to sort these ents by Z value (painter's algorithm)
+  for ent in ents
+    # draw everything that we can draw
+    display.draw ent.position.x, ent.position.y, ent.glyph.ch, ent.glyph.fg, ent.glyph.bg
+
+drawMessages = (world) ->
+  # clear some lines for messages
+  for y in [0...MESSAGE_HEIGHT]
+    clearLine y, "#000"
+  # locate the message log
+  ents = world.find "messages"
+  for ent in ents
+    {log} = ent.messages
+    # display the most recent messages
+    showMe = log.slice -MESSAGE_HEIGHT
+    for y in [0...showMe.length]
+      display.drawText 0, y, showMe[y]
+
+drawStatusLine = (world) ->
+  # determine where in the world the player is currently situated
+  posX = 0
+  posY = 0
+  posZ = 0
+  ents = world.find [ "player", "position" ]
+  for ent in ents
+    posX = ent.position.x
+    posY = ent.position.y
+    posZ = ent.position.z
+  # determine where we're going to draw the status line
+  STATUS_Y = DISPLAY_SIZE.HEIGHT-1
+  # clear a line for the status display
+  clearLine STATUS_Y, "#777"
+  # draw some status text
+  display.drawText 1, STATUS_Y, "%b{#777}%c{#000}X:#{posX} Y:#{posY} Z:#{posZ}"
 
 class exports.DrawingSystem extends System
   run: -> act @world
