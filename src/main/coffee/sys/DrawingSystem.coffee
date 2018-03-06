@@ -15,11 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{DISPLAY_SIZE, MESSAGE_HEIGHT} = require "../config"
+{DISPLAY_SIZE, MESSAGE_HEIGHT, WALL} = require "../config"
 {COMMAND_LIST, PLOT_SYNOPSIS, TITLE} = require "../story"
 
-_ = require "lodash"
 helper = require "../helper"
+
 {System} = require "./System"
 
 display = null
@@ -37,7 +37,8 @@ draw["Look"] = (world) ->
   camera = getCamera()
   # draw everything that needs to be drawn
   display.clear()
-  drawDebugPattern()
+  #drawDebugPattern()
+  drawWalls world, camera
   drawMap world, camera
   drawObjects world, camera
   drawMessages world, camera
@@ -63,7 +64,8 @@ draw["Play"] = (world) ->
   camera = getCamera()
   # draw everything that needs to be drawn
   display.clear()
-  drawDebugPattern()
+  #drawDebugPattern()
+  drawWalls world, camera
   drawMap world, camera
   drawObjects world, camera
   drawMessages world, camera
@@ -109,52 +111,52 @@ drawMap = (world, camera) ->
   frustum = translatePtoL DISPLAY_SIZE, camera
 
   # draw each of the rooms
-  ents = world.find "room"
+  ents = world.find [ "area", "glyph", "room" ]
   for ent in ents
-    {glyph, room} = ent
+    {area, glyph} = ent
     # don't draw rooms we can't see
-    continue if room.z isnt camera.z
-    continue if room.x2 < frustum.x1
-    continue if room.y2 < frustum.y1
-    continue if room.x1 > frustum.x2
-    continue if room.y1 > frustum.y2
+    continue if area.z isnt camera.z
+    continue if area.x2 < frustum.x1
+    continue if area.y2 < frustum.y1
+    continue if area.x1 > frustum.x2
+    continue if area.y1 > frustum.y2
     # draw the room
-    for y in [room.y1..room.y2]
-      for x in [room.x1..room.x2]
+    for y in [area.y1..area.y2]
+      for x in [area.x1..area.x2]
         px = x-frustum.x1
         py = y-frustum.y1
         display.draw px, py, glyph.ch, glyph.fg, glyph.bg
 
   # draw each of the corridors
-  ents = world.find "corridor"
+  ents = world.find [ "area", "corridor", "glyph" ]
   for ent in ents
-    {corridor, glyph} = ent
+    {area, glyph} = ent
     # don't draw corridors that we can't see
-    continue if corridor.z isnt camera.z
-    continue if corridor.x2 < frustum.x1
-    continue if corridor.y2 < frustum.y1
-    continue if corridor.x1 > frustum.x2
-    continue if corridor.y1 > frustum.y2
+    continue if area.z isnt camera.z
+    continue if area.x2 < frustum.x1
+    continue if area.y2 < frustum.y1
+    continue if area.x1 > frustum.x2
+    continue if area.y1 > frustum.y2
     # draw the corridor
-    for y in [corridor.y1..corridor.y2]
-      for x in [corridor.x1..corridor.x2]
+    for y in [area.y1..area.y2]
+      for x in [area.x1..area.x2]
         px = x-frustum.x1
         py = y-frustum.y1
         display.draw px, py, glyph.ch, glyph.fg, glyph.bg
 
   # draw each of the doors
-  ents = world.find "door"
+  ents = world.find [ "door", "glyph", "position" ]
   for ent in ents
-    {door, glyph} = ent
+    {glyph, position} = ent
     # don't draw corridors that we can't see
-    continue if door.z isnt camera.z
-    continue if door.x < frustum.x1
-    continue if door.y < frustum.y1
-    continue if door.x > frustum.x2
-    continue if door.y > frustum.y2
+    continue if position.z isnt camera.z
+    continue if position.x < frustum.x1
+    continue if position.y < frustum.y1
+    continue if position.x > frustum.x2
+    continue if position.y > frustum.y2
     # draw the door
-    px = door.x-frustum.x1
-    py = door.y-frustum.y1
+    px = position.x-frustum.x1
+    py = position.y-frustum.y1
     display.draw px, py, glyph.ch, glyph.fg, glyph.bg
 
 drawMessages = (world, camera) ->
@@ -190,10 +192,10 @@ drawStatusLine = (world, camera) ->
   # clear a line for the status display
   clearLine STATUS_Y, "#777"
   # determine where in the world the player is currently situated
-  ents = world.find [ "player", "position" ]
+  ents = world.find [ "name", "player", "position" ]
   for ent in ents
     {x,y,z} = ent.position
-    {name} = ent.player
+    {name} = ent.name
     # draw some status text
     mode = helper.getGameMode()
     switch mode
@@ -209,6 +211,26 @@ drawStatusLine = (world, camera) ->
     HELP_MSG = "[X] Exit Help" if mode is "Help"
     HELP_MSG = "[X] Exit Look" if mode is "Look"
     display.drawText DISPLAY_SIZE.WIDTH-(HELP_MSG.length+1), STATUS_Y, "%b{#777}%c{#000}#{HELP_MSG}"
+
+drawWalls = (world, camera) ->
+  # find the view frustum in camera space
+  frustum = translatePtoL DISPLAY_SIZE, camera
+  # draw anything with an area
+  ents = world.find "area"
+  for ent in ents
+    {area} = ent
+    # don't draw areas that we can't see
+    continue if area.z isnt camera.z
+    continue if area.x2 < frustum.x1
+    continue if area.y2 < frustum.y1
+    continue if area.x1 > frustum.x2
+    continue if area.y1 > frustum.y2
+    # draw the area with an extra border around it
+    for y in [area.y1-1..area.y2+1]
+      for x in [area.x1-1..area.x2+1]
+        px = x-frustum.x1
+        py = y-frustum.y1
+        display.draw px, py, WALL.GLYPH, WALL.FG, WALL.BG
 
 getCamera = ->
   {camera} = helper.getCamera()

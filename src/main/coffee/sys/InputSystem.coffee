@@ -17,9 +17,11 @@
 
 {STATION_SIZE} = require "../config"
 
-_ = require "lodash"
-{System} = require "./System"
 helper = require "../helper"
+
+{System} = require "./System"
+
+{GameMode} = require "../comp/GameMode"
 
 eventQueue = null
 handle = {}
@@ -31,9 +33,11 @@ act = (world) ->
   # determine what we're going to do with input
   mode = helper.getGameMode()
   # now let's check the event queue
-  for event in eventQueue
-    if not filterEvent event
-      handle[mode]?(world, event)
+  events = eventQueue.filter (x) ->
+    return false if x.vk in [ "VK_ALT", "VK_CONTROL", "VK_SHIFT" ]
+    return true
+  for event in events
+    handle[mode]?(world, event)
   # and clear the event queue
   eventQueue = []
 
@@ -63,6 +67,9 @@ handle["Play"] = (world, event) ->
       helper.setGameMode "Help"
     when "VK_L"
       helper.setGameMode "Look"
+    # TODO: Implement a message log review mode
+    # when "VK_M"
+    #   helper.setGameMode GameMode.MESSAGE_LOG
     else
       handlePlay world, event.vk
 
@@ -85,12 +92,6 @@ createEventQueue = (world) ->
   # return something reasonable to the caller
   return eventQueue
 
-filterEvent = (event) ->
-  switch event.vk
-    when "VK_ALT", "VK_CTRL", "VK_SHIFT"
-      return true
-  return false
-
 handleLook = (world, vk) ->
   {camera} = helper.getCamera()
   {x, y, z} = camera
@@ -108,22 +109,55 @@ handleLook = (world, vk) ->
 handlePlay = (world, vk) ->
   ent = helper.getPlayer()
   switch vk
-    when "VK_UP"
-      ent.position.y = Math.max -50, ent.position.y-1
-      helper.addMessage "You walk north."
-    when "VK_DOWN"
-      ent.position.y = Math.min 100, ent.position.y+1
-      helper.addMessage "You walk south."
-    when "VK_LEFT"
-      ent.position.x = Math.max -50, ent.position.x-1
-      helper.addMessage "You walk west."
-    when "VK_RIGHT"
-      ent.position.x = Math.min 100, ent.position.x+1
-      helper.addMessage "You walk east."
-    when "VK_ALT", "VK_CTRL", "VK_SHIFT"
+    when "VK_UP", "VK_DOWN", "VK_LEFT", "VK_RIGHT", "VK_SPACE"
+      handlePlayMove world, vk, ent
+      helper.tick()
     else
       helper.addMessage "DEBUG: Unknown key #{vk}"
   helper.setCamera ent.position.x, ent.position.y, ent.position.z
+
+handlePlayMove = (world, vk, ent) ->
+  msg = null
+  # determine the current position
+  {x,y,z} = ent.position
+  # compute the destination position
+  dx = x
+  dy = y
+  dz = z
+  switch vk
+    when "VK_UP"
+      dy--
+      msg = "You move north."
+    when "VK_DOWN"
+      dy++
+      msg = "You move south."
+    when "VK_LEFT"
+      dx--
+      msg = "You move west."
+    when "VK_RIGHT"
+      dx++
+      msg = "You move east."
+    when "VK_SPACE"
+      msg = "You pass."
+  # is the destination walkable?
+  walk = helper.isWalkable dx, dy, dz
+  if walk.ok
+    ent.position.x = dx
+    ent.position.y = dy
+    ent.position.z = dz
+  else
+    if walk.ent?
+      if walk.ent.door?
+        walk.ent.door.openingAfter = helper.getTick() + 1
+        msg = null
+      else if walk.ent.obstacle?
+        msg = "The obstacle blocks your path."
+      else
+        msg = "You can't move that way."
+    else
+      msg = "You can't move through the wall."
+  # update game state
+  helper.addMessage msg if msg?
 
 class exports.InputSystem extends System
   run: -> act @world

@@ -25,6 +25,24 @@ exports.addMessage = (msg) ->
     {log} = ent.messages
     log.push msg
 
+exports.canDoorClose = (doorEnt) ->
+  dx = doorEnt.position.x
+  dy = doorEnt.position.y
+  dz = doorEnt.position.z
+  # check everything that might be positioned at the door
+  ents = world.find "position"
+  for ent in ents
+    # the door won't stop itself from closing
+    continue if ent is doorEnt
+    # check if the thing is in the same position
+    {x,y,z} = ent.position
+    if (x is dx) and (y is dy) and (z is dz)
+      # only an obstacle will stop the door from closing
+      if ent.obstacle?
+        return false
+  # having checked all the entities, the door is allowed to close
+  return true
+
 exports.getCamera = ->
   ents = world.find "camera"
   for ent in ents
@@ -50,46 +68,90 @@ exports.getNameAt = (pos) ->
   for ent in ents
     {x, y, z} = ent.position
     if (lx is x) and (ly is y) and (lz is z)
+      if ent.door?
+        if ent.door.open
+          return "Door (Open)"
+        else
+          return "Door (Closed)"
       if ent.name?
         return ent.name.name
       else
         return "An object"
-  # next look for doors
-  ents = world.find "door"
-  for ent in ents
-    {x, y, z} = ent.door
-    if (lx is x) and (ly is y) and (lz is z)
-      if ent.door.open
-        return "Door (Open)"
-      else
-        return "Door (Closed)"
   # next look for corridors
   ents = world.find "corridor"
   for ent in ents
-    {x1, y1, x2, y2, z} = ent.corridor
+    {x1, y1, x2, y2, z} = ent.area
     if (lx >= x1) and (lx <= x2) and (ly >= y1) and (ly <= y2) and (lz is z)
       return "Corridor"
   # next look for rooms
   ents = world.find "room"
   for ent in ents
-    {x1, y1, x2, y2, z} = ent.room
+    {x1, y1, x2, y2, z} = ent.area
     if (lx >= x1) and (lx <= x2) and (ly >= y1) and (ly <= y2) and (lz is z)
       return "Room"
   # can't find anything at that location
   return "Nothing"
 
+exports.haveDoorAt = (dx, dy, dz) ->
+  ents = world.find [ "door", "position" ]
+  for ent in ents
+    {x,y,z} = ent.position
+    if (x is dx) and (y is dy) and (z is dz)
+      return true
+  return false
+
+exports.isWalkable = (wx, wy, wz) ->
+  # see if anything is blocking
+  ents = world.find [ "obstacle", "position" ]
+  for ent in ents
+    continue if ent.player? # the player doesn't block themselves
+    {x,y,z} = ent.position
+    if (x is wx) and (y is wy) and (z is wz)
+      return
+        ok: false
+        ent: ent
+  # next look for doors
+  ents = world.find "door"
+  for ent in ents
+    {x,y,z} = ent.position
+    {open} = ent.door
+    if (x is wx) and (y is wy) and (z is wz)
+      return
+        ok: open
+        ent: ent
+  # next look for corridors
+  ents = world.find "corridor"
+  for ent in ents
+    {x1, y1, x2, y2, z} = ent.area
+    if (wx >= x1) and (wx <= x2) and (wy >= y1) and (wy <= y2) and (wz is z)
+      return
+        ok: true
+        ent: ent
+  # next look for rooms
+  ents = world.find "room"
+  for ent in ents
+    {x1, y1, x2, y2, z} = ent.area
+    if (wx >= x1) and (wx <= x2) and (wy >= y1) and (wy <= y2) and (wz is z)
+      return
+        ok: true
+        ent: ent
+  # nothing allows us to walk there
+  return
+    ok: false
+    ent: null
+
 exports.getNearestRoom = (x, y, z) ->
   nearestRoom = null
   minDist = 4294967295
   # for every room in the world
-  ents = world.find "room"
+  ents = world.find ["area", "room"]
   for ent in ents
-    {room} = ent
+    {area} = ent
     # skip any rooms that aren't on the same level
-    continue if room.z isnt z
+    continue if area.z isnt z
     # determine the center of the room
-    cx = Math.floor (room.x1+room.x2) / 2
-    cy = Math.floor (room.y1+room.y2) / 2
+    cx = Math.floor (area.x1+area.x2) / 2
+    cy = Math.floor (area.y1+area.y2) / 2
     # determine the distance to the room
     dist = Math.sqrt (cx-x)*(cx-x) + (cy-y)*(cy-y)
     # if this room is closer than any we've found
@@ -110,6 +172,24 @@ exports.getRandomName = (x, y, z) ->
   {lastNames} = require "../data/lastNames"
   return "#{firstNames.random()} #{lastNames.random()}"
 
+exports.getTick = ->
+  ents = world.find "gameClock"
+  for ent in ents
+    return ent.gameClock.moves
+
+exports.order = (x1, y1, x2, y2) ->
+  # NOTE: the map generator can provide unordered coordinates
+  #       when generating corridors; this orders them
+  minX = Math.min x1, x2
+  maxX = Math.max x1, x2
+  minY = Math.min y1, y2
+  maxY = Math.max y1, y2
+  return
+    x1: minX
+    y1: minY
+    x2: maxX
+    y2: maxY
+
 exports.setCamera = (x, y, z) ->
   ents = world.find "camera"
   for ent in ents
@@ -125,6 +205,11 @@ exports.setGameMode = (mode) ->
 
 exports.setWorld = (x) ->
   world = x
+
+exports.tick = ->
+  ents = world.find "gameClock"
+  for ent in ents
+    ent.gameClock.moves++
 
 #----------------------------------------------------------------------
 # end of helper.coffee

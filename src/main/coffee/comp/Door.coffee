@@ -16,8 +16,11 @@
 #----------------------------------------------------------------------
 
 class exports.Door
-  constructor: (@x, @y, @z) ->
-    @open = false
+  constructor: (@open) ->
+    @open = false if not @open?
+
+  @CLOSED = false
+  @OPEN = true
 
 #----------------------------------------------------------------------
 # end of Door.coffee

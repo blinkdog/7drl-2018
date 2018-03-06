@@ -23,3 +23,21 @@ entity, then destructuring can pick out all the components that
 we want to access.
 
     {room} = helper.getNearestRoom 0, STATION_SIZE.HEIGHT, STATION_SIZE.LEVELS
+
+## Understanding ECS
+One of my goals with 7DRL 2018 was to learn more about design with
+Entity-Component-System architecture. This certainly has been a good
+learning experience, but the deadline makes rewriting poor component
+choices painful at best.
+
+### Payoff
+The DrawingSystem was able to create the walls by painting areas
+as larger than they were. This turned out to be a pretty great win.
+
+## Understanding ROT
+Sigh. ROT gave me corridors with unordered coordinates. ROT gave me
+doors that overlap. It is painful to discover these 'features' under
+the pressure of the deadline.
+
+## Editor going 100% CPU and non-responsive
+Sucks. Really, WTF?

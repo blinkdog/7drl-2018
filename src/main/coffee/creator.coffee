@@ -15,26 +15,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-STATION_SIZE =
-  WIDTH: 80
-  HEIGHT: 25
-  LEVELS: 100
+{STATION_SIZE} = require "./config"
 
 helper = require "./helper"
 
+{Area} = require "./comp/Area"
 {Camera} = require "./comp/Camera"
 {Corridor} = require "./comp/Corridor"
 {Door} = require "./comp/Door"
 {Room} = require "./comp/Room"
+{GameClock} = require "./comp/GameClock"
 {GameMode} = require "./comp/GameMode"
 {Glyph} = require "./comp/Glyph"
 {Messages} = require "./comp/Messages"
 {Name} = require "./comp/Name"
+{Obstacle} = require "./comp/Obstacle"
 {Player} = require "./comp/Player"
 {Position} = require "./comp/Position"
 
 exports.create = (world) ->
   # create our game
+  ent = world.createEntity()
+  gameClock = new GameClock 0
+  world.addComponent ent, "gameClock", gameClock
   ent = world.createEntity()
   gameMode = new GameMode()
   world.addComponent ent, "gameMode", gameMode
@@ -51,37 +54,50 @@ exports.create = (world) ->
     # create a room entity for each room
     for room in map.getRooms()
       ent = world.createEntity()
-      roomComp = new Room room.getLeft(), room.getTop(), room.getRight(), room.getBottom(), i
+      area = new Area room.getLeft(), room.getTop(), room.getRight(), room.getBottom(), i
+      world.addComponent ent, "area", area
+      roomComp = new Room()
       world.addComponent ent, "room", roomComp
       glyph = new Glyph ".", "#777", "#000"
       world.addComponent ent, "glyph", glyph
       # create a door entity for each door
       room.getDoors (x, y) ->
+        # NOTE: generator will provide overlapping doors
+        return if helper.haveDoorAt x, y, i
+        # no door there yet, so let's create *one*
         ent = world.createEntity()
-        door = new Door x, y, i
+        door = new Door Door.CLOSED
         world.addComponent ent, "door", door
         glyph = new Glyph "Z", "#777", "#000"
         world.addComponent ent, "glyph", glyph
+        obstacle = new Obstacle()
+        world.addComponent ent, "obstacle", obstacle
+        position = new Position x, y, i
+        world.addComponent ent, "position", position
     # create a corridor entity for each corridor
     for corridor in map.getCorridors()
       ent = world.createEntity()
-      corridorComp = new Corridor corridor._startX, corridor._startY, corridor._endX, corridor._endY, i
+      oc = helper.order corridor._startX, corridor._startY, corridor._endX, corridor._endY
+      area = new Area oc.x1, oc.y1, oc.x2, oc.y2, i
+      world.addComponent ent, "area", area
+      corridorComp = new Corridor()
       world.addComponent ent, "corridor", corridorComp
       glyph = new Glyph ".", "#777", "#000"
       world.addComponent ent, "glyph", glyph
 
   # create our protagonist
   ent = world.createEntity()
-  myNameIs = helper.getRandomName()
-  player = new Player myNameIs
-  world.addComponent ent, "player", player
-  name = new Name myNameIs
-  world.addComponent ent, "name", name
   glyph = new Glyph "@"
   world.addComponent ent, "glyph", glyph
-  {room} = helper.getNearestRoom 0, STATION_SIZE.HEIGHT, STATION_SIZE.LEVELS
-  roomX = Math.floor (room.x1+room.x2) / 2
-  roomY = Math.floor (room.y1+room.y2) / 2
+  name = new Name helper.getRandomName()
+  world.addComponent ent, "name", name
+  obstacle = new Obstacle()
+  world.addComponent ent, "obstacle", obstacle
+  player = new Player()
+  world.addComponent ent, "player", player
+  {area} = helper.getNearestRoom 0, STATION_SIZE.HEIGHT, STATION_SIZE.LEVELS
+  roomX = Math.floor (area.x1+area.x2) / 2
+  roomY = Math.floor (area.y1+area.y2) / 2
   position = new Position roomX, roomY, STATION_SIZE.LEVELS
   world.addComponent ent, "position", position
 

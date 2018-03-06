@@ -21,9 +21,11 @@ audio = require "./audio"
 creator = require "./creator"
 helper = require "./helper"
 
+{DoorSystem} = require "./sys/DoorSystem"
 {DrawingSystem} = require "./sys/DrawingSystem"
 {InputSystem} = require "./sys/InputSystem"
 
+doorSystem = null
 drawingSystem = null
 inputSystem = null
 world = null
@@ -43,6 +45,7 @@ mainLoop = ->
   loopRunning = true
   # TODO: Run the game's main loop here
   inputSystem.run()
+  doorSystem.run()
   drawingSystem.run()
   # drop the loop flag
   loopRunning = false
@@ -69,6 +72,7 @@ exports.run = ->
   helper.setWorld world
   creator.create world
   # create the systems that will animate our world
+  doorSystem = new DoorSystem world
   drawingSystem = new DrawingSystem world
   inputSystem = new InputSystem world
   # run the main loop

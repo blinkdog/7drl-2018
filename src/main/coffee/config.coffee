@@ -19,12 +19,19 @@ exports.DISPLAY_SIZE =
   WIDTH: 80
   HEIGHT: 30
 
+exports.DOOR_CLOSE_TICKS = 3
+
 exports.MESSAGE_HEIGHT = 4
 
 exports.STATION_SIZE =
   WIDTH: 80
   HEIGHT: 25
-  LEVELS: 100
+  LEVELS: 1
+
+exports.WALL =
+  GLYPH: "#"
+  FG: "#777"
+  BG: "#111"
 
 #----------------------------------------------------------------------
 # end of config.coffee

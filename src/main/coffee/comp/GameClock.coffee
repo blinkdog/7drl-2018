@@ -1,4 +1,4 @@
-# Player.coffee
+# GameClock.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-class exports.Player
-  constructor: ->
+class exports.GameClock
+  constructor: (@moves) ->
+    @moves = 0 if not @moves?
 
 #----------------------------------------------------------------------
-# end of Player.coffee
+# end of GameClock.coffee

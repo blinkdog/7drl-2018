@@ -1,19 +1,20 @@
 # TODO.md
 A roadmap for working on the project
 
-## Essentials
+## Planned Features
 * [X] Message display
 * [X] Status line
 * [X] Single level map
 * [X] Scrolling map
 * [X] Look command under cursor
-* [ ] Check walls and doors for map movement
-* [ ] Door open/close command
+* [X] Check walls and doors for map movement
+* [X] Door open/close command
+* [ ] Message Scrollback
 * [ ] Lifts between station floors
-
-## Planned Features
-* [ ] ???
+* [ ] Moving Aliens
 
 ## Wishlist
-* [ ] Message Scrollback
 * [ ] Schrödinger's Items
+
+## Dev Chores
+* [ ] Remove unnecessary lodash imports
