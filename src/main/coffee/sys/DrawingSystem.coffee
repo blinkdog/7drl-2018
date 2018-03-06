@@ -15,21 +15,50 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-DISPLAY_SIZE =
-  WIDTH: 80
-  HEIGHT: 30
-
-MESSAGE_HEIGHT = 4
+{DISPLAY_SIZE, MESSAGE_HEIGHT} = require "../config"
+{COMMAND_LIST, PLOT_SYNOPSIS, TITLE} = require "../story"
 
 _ = require "lodash"
 helper = require "../helper"
 {System} = require "./System"
 
 display = null
+draw = {}
 
 act = (world) ->
   # first, ensure that we've got a display
   createDisplay() if not display?
+  # determine what we're going to draw
+  mode = helper.getGameMode()
+  draw[mode]?(world)
+
+draw["Look"] = (world) ->
+  # get the position of the camera
+  camera = getCamera()
+  # draw everything that needs to be drawn
+  display.clear()
+  drawDebugPattern()
+  drawMap world, camera
+  drawObjects world, camera
+  drawMessages world, camera
+  drawStatusLine world, camera
+  drawLookDot world, camera
+  # return something reasonable to the caller
+  return true
+
+draw["Help"] = (world) ->
+  # get the position of the camera
+  camera = getCamera()
+  # draw the help display
+  display.clear()
+  display.drawText 30, 6, "Space Station TDA616"
+  display.drawText 5, 8, PLOT_SYNOPSIS, 70
+  display.drawText 36, 13, "COMMANDS"
+  display.drawText 5, 15, COMMAND_LIST, 70
+  drawMessages world, camera
+  drawStatusLine world, camera
+
+draw["Play"] = (world) ->
   # get the position of the camera
   camera = getCamera()
   # draw everything that needs to be drawn
@@ -41,6 +70,8 @@ act = (world) ->
   drawStatusLine world, camera
   # return something reasonable to the caller
   return true
+
+#----------------------------------------------------------------------
 
 clearLine = (y, bg) ->
   bg ?= "#000"
@@ -66,6 +97,12 @@ drawDebugPattern = ->
   for y in [0...DISPLAY_SIZE.HEIGHT]
     for x in [0...DISPLAY_SIZE.WIDTH]
       display.draw x, y, "#", "#f0f", "#000"
+
+drawLookDot = (world, camera) ->
+  frustum = translatePtoL DISPLAY_SIZE, camera
+  px = camera.x-frustum.x1
+  py = camera.y-frustum.y1
+  display.draw px, py, "*", "#0ff", "#000"
 
 drawMap = (world, camera) ->
   # find the view frustum in camera space
@@ -148,28 +185,34 @@ drawObjects = (world, camera) ->
     display.draw px, py, glyph.ch, glyph.fg, glyph.bg
 
 drawStatusLine = (world, camera) ->
-  # determine where in the world the player is currently situated
-  posX = 0
-  posY = 0
-  posZ = 0
-  ents = world.find [ "player", "position" ]
-  for ent in ents
-    posX = ent.position.x
-    posY = ent.position.y
-    posZ = ent.position.z
   # determine where we're going to draw the status line
   STATUS_Y = DISPLAY_SIZE.HEIGHT-1
   # clear a line for the status display
   clearLine STATUS_Y, "#777"
-  # draw some status text
-  display.drawText 1, STATUS_Y, "%b{#777}%c{#000}Level #{posZ} - X:#{posX} Y:#{posY}"
+  # determine where in the world the player is currently situated
+  ents = world.find [ "player", "position" ]
+  for ent in ents
+    {x,y,z} = ent.position
+    {name} = ent.player
+    # draw some status text
+    mode = helper.getGameMode()
+    switch mode
+      when "Play"
+        STATUS_MSG = "%b{#777}%c{#000}[#{name}] Level:#{z} (#{x}, #{y})"
+      when "Look"
+        observed = helper.getNameAt getCamera()
+        STATUS_MSG = "%b{#777}%c{#000}[Look] #{observed}"
+      when "Help"
+        STATUS_MSG = "%b{#777}%c{#000}[Help] Level:#{z} (#{x}, #{y})"
+    display.drawText 0, STATUS_Y, STATUS_MSG
+    HELP_MSG = "[?] Help"
+    HELP_MSG = "[X] Exit Help" if mode is "Help"
+    HELP_MSG = "[X] Exit Look" if mode is "Look"
+    display.drawText DISPLAY_SIZE.WIDTH-(HELP_MSG.length+1), STATUS_Y, "%b{#777}%c{#000}#{HELP_MSG}"
 
 getCamera = ->
-  player = helper.getPlayer()
-  return
-    x: player.position.x
-    y: player.position.y
-    z: player.position.z
+  {camera} = helper.getCamera()
+  return camera
 
 translatePtoL = (dispSize, camera) ->
   # define the frustum to be the size of the display

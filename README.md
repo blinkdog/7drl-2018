@@ -9,8 +9,10 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 * 158: Empty message and status lines
 * 152: Useful message lines and non-empty status line
 * 137: Displaying scrollable generated maps
+* 131: Game modes Look, Help, Play; named player
 
 ## Thanks
+* Darius Kazemi for [Corpora](https://github.com/dariusk/corpora); names from census data
 * Mike Koenig for [Martian Scanner](http://soundbible.com/878-Martian-Scanner.html) sound effect
 
 ## License

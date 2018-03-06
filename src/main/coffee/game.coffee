@@ -68,15 +68,9 @@ exports.run = ->
   world = new World()
   helper.setWorld world
   creator.create world
+  # create the systems that will animate our world
   drawingSystem = new DrawingSystem world
   inputSystem = new InputSystem world
-  # DEBUG: add some messages to test that functionality
-  setInterval ->
-    ents = world.find "messages"
-    for ent in ents
-      ent.messages.log.push "#{Date.now()}: Some time elapsed..."
-    window.API.game.next()
-  , 5000
   # run the main loop
   mainLoop()
 

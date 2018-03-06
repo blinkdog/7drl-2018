@@ -1,4 +1,4 @@
-# Player.coffee
+# GameMode.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-class exports.Player
-  constructor: (@name) ->
-    # TODO: This should be moved over the Name component instead
-    @name = ["Fred Bloggs", "Jane Doe"].random() if not @name?
-    @player = true
+class exports.GameMode
+  constructor: (@mode) ->
+    @mode = "Play" if not @mode?
+    @MODES = [
+      "Help"      # looking at the help screen for commands
+      "Look"      # using the look command to examine the map
+      "Play"      # taking action as the protagonist
+    ]
 
 #----------------------------------------------------------------------
-# end of Player.coffee
+# end of GameMode.coffee

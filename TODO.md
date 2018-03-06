@@ -6,7 +6,7 @@ A roadmap for working on the project
 * [X] Status line
 * [X] Single level map
 * [X] Scrolling map
-* [ ] Look command under cursor
+* [X] Look command under cursor
 * [ ] Check walls and doors for map movement
 * [ ] Door open/close command
 * [ ] Lifts between station floors

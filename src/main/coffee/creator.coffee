@@ -22,15 +22,23 @@ STATION_SIZE =
 
 helper = require "./helper"
 
+{Camera} = require "./comp/Camera"
 {Corridor} = require "./comp/Corridor"
 {Door} = require "./comp/Door"
 {Room} = require "./comp/Room"
+{GameMode} = require "./comp/GameMode"
 {Glyph} = require "./comp/Glyph"
 {Messages} = require "./comp/Messages"
+{Name} = require "./comp/Name"
 {Player} = require "./comp/Player"
 {Position} = require "./comp/Position"
 
 exports.create = (world) ->
+  # create our game
+  ent = world.createEntity()
+  gameMode = new GameMode()
+  world.addComponent ent, "gameMode", gameMode
+
   # create the messages log
   ent = world.createEntity()
   messages = new Messages()
@@ -64,8 +72,11 @@ exports.create = (world) ->
 
   # create our protagonist
   ent = world.createEntity()
-  player = new Player "Fred Bloggs"
+  myNameIs = helper.getRandomName()
+  player = new Player myNameIs
   world.addComponent ent, "player", player
+  name = new Name myNameIs
+  world.addComponent ent, "name", name
   glyph = new Glyph "@"
   world.addComponent ent, "glyph", glyph
   {room} = helper.getNearestRoom 0, STATION_SIZE.HEIGHT, STATION_SIZE.LEVELS
@@ -73,6 +84,15 @@ exports.create = (world) ->
   roomY = Math.floor (room.y1+room.y2) / 2
   position = new Position roomX, roomY, STATION_SIZE.LEVELS
   world.addComponent ent, "position", position
+
+  # create our camera
+  ent = world.createEntity()
+  camera = new Camera position.x, position.y, position.z
+  world.addComponent ent, "camera", camera
+
+  # add a message to the world about our protagonist
+  messages.log.push "" for x in [0..3]
+  messages.log.push "I am #{name.name}, station cargo handler."
 
 #----------------------------------------------------------------------
 # end of creator.coffee

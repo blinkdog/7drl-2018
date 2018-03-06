@@ -1,4 +1,4 @@
-# Player.coffee
+# Name.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-class exports.Player
+class exports.Name
   constructor: (@name) ->
-    # TODO: This should be moved over the Name component instead
     @name = ["Fred Bloggs", "Jane Doe"].random() if not @name?
-    @player = true
 
 #----------------------------------------------------------------------
-# end of Player.coffee
+# end of Name.coffee
