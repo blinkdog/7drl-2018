@@ -4,7 +4,7 @@
 
 exports.COMMAND_LIST = """
   ?                         View Help (**YOU ARE HERE**)
-  ESC, X                    Exit Special Modes
+  ESC, Q, X                 Exit Special Modes
   Up, Down, Left, Right     Move
   L                         Look Mode
   M                         Review Messages Log

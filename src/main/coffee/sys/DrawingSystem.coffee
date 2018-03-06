@@ -211,23 +211,25 @@ drawStatusLine = (world, camera) ->
   STATUS_Y = DISPLAY_SIZE.HEIGHT-1
   # clear a line for the status display
   clearLine STATUS_Y, "#777"
+  # determine where the camera is looking at this time
+  {x,y,z} = camera
   # determine where in the world the player is currently situated
   ents = world.find [ "name", "player", "position" ]
   for ent in ents
-    {x,y,z} = ent.position
     {name} = ent.name
     # draw some status text
     mode = helper.getGameMode()
     switch mode
       when GameMode.HELP
-        STATUS_MSG = "%b{#777}%c{#000}[Help] Level:#{z} (#{x}, #{y})"
+        STATUS_MSG = "%b{#777}%c{#000}[Help] Level:#{z} (#{x},#{y})"
       when GameMode.LOOK
         observed = helper.getNameAt getCamera()
-        STATUS_MSG = "%b{#777}%c{#000}[Look] #{observed}"
+        STATUS_MSG = "%b{#777}%c{#000}[Look] Level:#{z} (#{x},#{y}) #{observed}"
       when GameMode.MESSAGES
-        STATUS_MSG = "%b{#777}%c{#000}[Message Log] Level:#{z} (#{x}, #{y})"
+        {log} = helper.getMessages().messages
+        STATUS_MSG = "%b{#777}%c{#000}[Message Log] #{y+1}/#{log.length}"
       when GameMode.PLAY
-        STATUS_MSG = "%b{#777}%c{#000}[#{name}] Level:#{z} (#{x}, #{y})"
+        STATUS_MSG = "%b{#777}%c{#000}[#{name}] Level:#{z} (#{x},#{y})"
     display.drawText 0, STATUS_Y, STATUS_MSG
     HELP_MSG = "[?] Help"
     HELP_MSG = "[X] Exit Help" if mode is GameMode.HELP
