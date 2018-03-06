@@ -7,6 +7,7 @@ exports.COMMAND_LIST = """
   ESC, X                    Exit Special Modes
   Up, Down, Left, Right     Move
   L                         Look Mode
+  M                         Review Messages Log
 """
 
 exports.PLOT_SYNOPSIS = """

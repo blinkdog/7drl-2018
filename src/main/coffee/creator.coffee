@@ -107,7 +107,6 @@ exports.create = (world) ->
   world.addComponent ent, "camera", camera
 
   # add a message to the world about our protagonist
-  messages.log.push "" for x in [0..3]
   messages.log.push "I am #{name.name}, station cargo handler."
 
 #----------------------------------------------------------------------

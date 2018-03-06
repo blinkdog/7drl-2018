@@ -19,10 +19,10 @@ class exports.GameMode
   constructor: (@mode) ->
     @mode = "Play" if not @mode?
 
-  @HELP = "Help"              # looking at the help screen for commands
-  @LOOK = "Look"              # using the look command to examine the map
-  @MESSAGE_LOG = "Messages"   # reviewing the log of game messages
-  @PLAY = "Play"              # taking action as the protagonist
+  @HELP = "Help"             # looking at the help screen for commands
+  @LOOK = "Look"             # using the look command to examine the map
+  @MESSAGES = "Messages"     # reviewing the log of game messages
+  @PLAY = "Play"             # taking action as the protagonist
 
 #----------------------------------------------------------------------
 # end of GameMode.coffee

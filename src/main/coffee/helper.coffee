@@ -140,6 +140,12 @@ exports.isWalkable = (wx, wy, wz) ->
     ok: false
     ent: null
 
+exports.getMessages = ->
+  ents = world.find "messages"
+  for ent in ents
+    return ent
+  return null
+
 exports.getNearestRoom = (x, y, z) ->
   nearestRoom = null
   minDist = 4294967295

@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{STATION_SIZE} = require "../config"
+{DISPLAY_SIZE, STATION_SIZE} = require "../config"
 
 helper = require "../helper"
 
@@ -41,35 +41,48 @@ act = (world) ->
   # and clear the event queue
   eventQueue = []
 
-handle["Help"] = (world, event) ->
+handle[GameMode.HELP] = (world, event) ->
   switch event.vk
-    when "VK_ESCAPE", "VK_X"
+    when "VK_ESCAPE", "VK_Q", "VK_X"
       {position} = helper.getPlayer()
       {x, y, z} = position
       helper.setCamera x, y, z
-      helper.setGameMode "Play"
+      helper.setGameMode GameMode.PLAY
     else
       helper.addMessage "Unknown key #{event.vk}: Press ESC or X to exit Help mode."
 
-handle["Look"] = (world, event) ->
+handle[GameMode.LOOK] = (world, event) ->
   switch event.vk
-    when "VK_ESCAPE", "VK_X"
+    when "VK_ESCAPE", "VK_Q", "VK_X"
       {position} = helper.getPlayer()
       {x, y, z} = position
       helper.setCamera x, y, z
-      helper.setGameMode "Play"
+      helper.setGameMode GameMode.PLAY
     else
       handleLook world, event.vk
 
-handle["Play"] = (world, event) ->
+handle[GameMode.MESSAGES] = (world, event) ->
+  switch event.vk
+    when "VK_ESCAPE", "VK_Q", "VK_X"
+      {position} = helper.getPlayer()
+      {x, y, z} = position
+      helper.setCamera x, y, z
+      helper.setGameMode GameMode.PLAY
+    else
+      handleMessages world, event.vk
+
+handle[GameMode.PLAY] = (world, event) ->
   switch event.vk
     when "VK_SLASH"
-      helper.setGameMode "Help"
+      helper.setGameMode GameMode.HELP
     when "VK_L"
-      helper.setGameMode "Look"
-    # TODO: Implement a message log review mode
-    # when "VK_M"
-    #   helper.setGameMode GameMode.MESSAGE_LOG
+      helper.setGameMode GameMode.LOOK
+    when "VK_M"
+      {messages} = helper.getMessages()
+      {log} = messages
+      y = Math.max 0, log.length-DISPLAY_SIZE.HEIGHT+2
+      helper.setCamera 0, y, 0
+      helper.setGameMode GameMode.MESSAGES
     else
       handlePlay world, event.vk
 
@@ -104,6 +117,24 @@ handleLook = (world, vk) ->
       x = Math.max 0, x-1
     when "VK_RIGHT"
       x = Math.min STATION_SIZE.WIDTH, x+1
+  helper.setCamera x, y, z
+
+handleMessages = (world, vk) ->
+  {camera} = helper.getCamera()
+  {x, y, z} = camera
+  {messages} = helper.getMessages()
+  {log} = messages
+  # modify camera position
+  switch vk
+    when "VK_UP"
+      y = Math.max 0, y-1
+    when "VK_DOWN"
+      y = Math.min log.length-1, y+1
+    when "VK_PAGE_UP"
+      y = Math.max 0, y-(DISPLAY_SIZE.HEIGHT>>1)
+    when "VK_PAGE_DOWN"
+      y = Math.min log.length-1, y+(DISPLAY_SIZE.HEIGHT>>1)
+  # set new camera position
   helper.setCamera x, y, z
 
 handlePlay = (world, vk) ->

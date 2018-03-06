@@ -22,6 +22,8 @@ helper = require "../helper"
 
 {System} = require "./System"
 
+{GameMode} = require "../comp/GameMode"
+
 display = null
 draw = {}
 
@@ -32,7 +34,19 @@ act = (world) ->
   mode = helper.getGameMode()
   draw[mode]?(world)
 
-draw["Look"] = (world) ->
+draw[GameMode.HELP] = (world) ->
+  # get the position of the camera
+  camera = getCamera()
+  # draw the help display
+  display.clear()
+  display.drawText 30, 6, "Space Station TDA616"
+  display.drawText 5, 8, PLOT_SYNOPSIS, 70
+  display.drawText 36, 13, "COMMANDS"
+  display.drawText 5, 15, COMMAND_LIST, 70
+  drawMessages world, camera
+  drawStatusLine world, camera
+
+draw[GameMode.LOOK] = (world) ->
   # get the position of the camera
   camera = getCamera()
   # draw everything that needs to be drawn
@@ -47,19 +61,15 @@ draw["Look"] = (world) ->
   # return something reasonable to the caller
   return true
 
-draw["Help"] = (world) ->
+draw[GameMode.MESSAGES] = (world) ->
   # get the position of the camera
   camera = getCamera()
   # draw the help display
   display.clear()
-  display.drawText 30, 6, "Space Station TDA616"
-  display.drawText 5, 8, PLOT_SYNOPSIS, 70
-  display.drawText 36, 13, "COMMANDS"
-  display.drawText 5, 15, COMMAND_LIST, 70
-  drawMessages world, camera
+  drawMessageLog world, camera
   drawStatusLine world, camera
 
-draw["Play"] = (world) ->
+draw[GameMode.PLAY] = (world) ->
   # get the position of the camera
   camera = getCamera()
   # draw everything that needs to be drawn
@@ -172,6 +182,16 @@ drawMessages = (world, camera) ->
     for y in [0...showMe.length]
       display.drawText 0, y, showMe[y]
 
+drawMessageLog = (world, camera) ->
+  # locate the message log
+  ents = world.find "messages"
+  for ent in ents
+    {log} = ent.messages
+    # display the most recent messages
+    showMe = log.slice camera.y, camera.y+DISPLAY_SIZE.HEIGHT-1
+    for y in [0...showMe.length]
+      display.drawText 0, y, showMe[y]
+
 drawObjects = (world, camera) ->
   # find the view frustum in camera space
   frustum = translatePtoL DISPLAY_SIZE, camera
@@ -199,17 +219,20 @@ drawStatusLine = (world, camera) ->
     # draw some status text
     mode = helper.getGameMode()
     switch mode
-      when "Play"
-        STATUS_MSG = "%b{#777}%c{#000}[#{name}] Level:#{z} (#{x}, #{y})"
-      when "Look"
+      when GameMode.HELP
+        STATUS_MSG = "%b{#777}%c{#000}[Help] Level:#{z} (#{x}, #{y})"
+      when GameMode.LOOK
         observed = helper.getNameAt getCamera()
         STATUS_MSG = "%b{#777}%c{#000}[Look] #{observed}"
-      when "Help"
-        STATUS_MSG = "%b{#777}%c{#000}[Help] Level:#{z} (#{x}, #{y})"
+      when GameMode.MESSAGES
+        STATUS_MSG = "%b{#777}%c{#000}[Message Log] Level:#{z} (#{x}, #{y})"
+      when GameMode.PLAY
+        STATUS_MSG = "%b{#777}%c{#000}[#{name}] Level:#{z} (#{x}, #{y})"
     display.drawText 0, STATUS_Y, STATUS_MSG
     HELP_MSG = "[?] Help"
-    HELP_MSG = "[X] Exit Help" if mode is "Help"
-    HELP_MSG = "[X] Exit Look" if mode is "Look"
+    HELP_MSG = "[X] Exit Help" if mode is GameMode.HELP
+    HELP_MSG = "[X] Exit Look" if mode is GameMode.LOOK
+    HELP_MSG = "[X] Exit Message Log" if mode is GameMode.MESSAGES
     display.drawText DISPLAY_SIZE.WIDTH-(HELP_MSG.length+1), STATUS_Y, "%b{#777}%c{#000}#{HELP_MSG}"
 
 drawWalls = (world, camera) ->

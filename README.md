@@ -11,6 +11,7 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 * 137: Displaying scrollable generated maps
 * 131: Game modes Look, Help, Play; named player
 * 115: Walls restrict movement; doors open and close
+* 113: Message Scrollback
 
 ## Thanks
 * Darius Kazemi for [Corpora](https://github.com/dariusk/corpora); names from census data
