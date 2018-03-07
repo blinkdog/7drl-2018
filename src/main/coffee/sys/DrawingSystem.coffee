@@ -202,9 +202,18 @@ drawObjects = (world, camera) ->
     # always draw the player last
     return 1 if a.player?
     return -1 if b.player?
-    # try to draw the doors last
-    return 1 if a.door?
-    return -1 if b.door?
+    # draw the aliens 2nd to last
+    return 1 if a.alien?
+    return -1 if b.alien?
+    # draw the crew 3rd to last
+    return 1 if a.crew?
+    return -1 if b.crew?
+    # try to draw the lifts first
+    return -1 if a.lift?
+    return 1 if b.lift?
+    # try to draw the doors first
+    return -1 if a.door?
+    return 1 if b.door?
   # for each entity, draw it
   for ent in ents
     {glyph, position} = ent

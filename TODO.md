@@ -12,10 +12,15 @@ A roadmap for working on the project
 * [X] Message Scrollback
 * [X] Lifts between station floors
 * [X] The Alien Ship
-* [ ] Moving Aliens
+* [X] Moving Aliens
+* [X] Moving Station Crew
 * [ ] Attacking Aliens
+* [ ] Following/Defending Station Crew
 * [ ] Items
 * [ ] Method to destroy The Alien Ship
+* [ ] Map Key
+* [ ] LOS+FOW
+* [ ] Aliens Shapeshifted into Station Crew
 * [ ] Environmentals
   * [ ] Room/Corridor Temperature
   * [ ] Room/Corridor Oxygen

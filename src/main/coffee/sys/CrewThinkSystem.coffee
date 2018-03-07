@@ -1,4 +1,4 @@
-# config.coffee
+# CrewThinkSystem.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,27 +15,36 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-exports.DISPLAY_SIZE =
-  WIDTH: 80
-  HEIGHT: 30
+helper = require "../helper"
 
-exports.DOOR_CLOSE_TICKS = 3
+{System} = require "./System"
 
-exports.MESSAGE_HEIGHT = 4
+lastTick = 0
 
-exports.STATION_SIZE =
-  WIDTH: 80
-  HEIGHT: 25
-  LEVELS: 10
+act = (world) ->
+  # determine which tick it is
+  currentTick = helper.getTick()
+  # bail if the game hasn't advanced at all
+  return if currentTick <= lastTick
+  # for each crew in the world
+  ents = world.find "crew"
+  for ent in ents
+    {x,y,z} = ent.position
+    # mill about randomly
+    x-- if ROT.RNG.getUniform() < 0.5
+    x++ if ROT.RNG.getUniform() < 0.5
+    y-- if ROT.RNG.getUniform() < 0.5
+    y++ if ROT.RNG.getUniform() < 0.5
+    walk = helper.isWalkable x,y,z
+    if walk.ok
+      ent.position.x = x
+      ent.position.y = y
+      ent.position.z = z
+  # mark that we've processed this tick
+  lastTick = currentTick
 
-exports.WALL =
-  GLYPH: " "
-  FG: "#777"
-  BG: "#111"
-
-exports.NUM_ALIENS = exports.STATION_SIZE.LEVELS*2
-
-exports.NUM_CREW = exports.STATION_SIZE.LEVELS
+class exports.CrewThinkSystem extends System
+  run: -> act @world
 
 #----------------------------------------------------------------------
-# end of config.coffee
+# end of CrewThinkSystem.coffee

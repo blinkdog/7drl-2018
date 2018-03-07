@@ -63,6 +63,12 @@ exports.getLiftOnLevel = (level, going) ->
       return ent
   return null
 
+exports.getMessages = ->
+  ents = world.find "messages"
+  for ent in ents
+    return ent
+  return null
+
 # TODO: Feels like there could be a better position/extents -> name
 #       implementation using entity components, but I don't want to
 #       rewrite it right now
@@ -99,6 +105,49 @@ exports.getNameAt = (pos) ->
   # can't find anything at that location
   return "Nothing"
 
+exports.getNearestRoom = (x, y, z) ->
+  nearestRoom = null
+  minDist = 4294967295
+  # for every room in the world
+  ents = world.find ["area", "room"]
+  for ent in ents
+    {area} = ent
+    # skip any rooms that aren't on the same level
+    continue if area.z isnt z
+    # determine the center of the room
+    cx = Math.floor (area.x1+area.x2) / 2
+    cy = Math.floor (area.y1+area.y2) / 2
+    # determine the distance to the room
+    dist = Math.sqrt (cx-x)*(cx-x) + (cy-y)*(cy-y)
+    # if this room is closer than any we've found
+    if dist < minDist
+      minDist = dist
+      nearestRoom = ent
+  # return the room nearest to the provided coordinates
+  return nearestRoom
+
+exports.getPlayer = ->
+  ents = world.find "player"
+  for ent in ents
+    return ent
+  return null
+
+exports.getRandomName = (x, y, z) ->
+  {firstNames} = require "../data/firstNames"
+  {lastNames} = require "../data/lastNames"
+  return "#{firstNames.random()} #{lastNames.random()}"
+
+exports.getRoomOnLevel = (z) ->
+  ents = world.find [ "area", "room" ]
+  ents = ents.filter (a) ->
+    return a.area.z is z
+  return ents.random()
+
+exports.getTick = ->
+  ents = world.find "gameClock"
+  for ent in ents
+    return ent.gameClock.moves
+
 exports.getUsableAt = (ux, uy, uz) ->
   ents = world.find [ "position" ]
   ents = ents.filter (a) ->
@@ -121,6 +170,8 @@ exports.isWalkable = (wx, wy, wz) ->
   # see if anything is blocking
   ents = world.find [ "obstacle", "position" ]
   for ent in ents
+    continue if ent.alien?  # aliens don't block themselves
+    continue if ent.crew?   # crew don't block themselves
     continue if ent.player? # the player doesn't block themselves
     {x,y,z} = ent.position
     if (x is wx) and (y is wy) and (z is wz)
@@ -156,49 +207,6 @@ exports.isWalkable = (wx, wy, wz) ->
   return
     ok: false
     ent: null
-
-exports.getMessages = ->
-  ents = world.find "messages"
-  for ent in ents
-    return ent
-  return null
-
-exports.getNearestRoom = (x, y, z) ->
-  nearestRoom = null
-  minDist = 4294967295
-  # for every room in the world
-  ents = world.find ["area", "room"]
-  for ent in ents
-    {area} = ent
-    # skip any rooms that aren't on the same level
-    continue if area.z isnt z
-    # determine the center of the room
-    cx = Math.floor (area.x1+area.x2) / 2
-    cy = Math.floor (area.y1+area.y2) / 2
-    # determine the distance to the room
-    dist = Math.sqrt (cx-x)*(cx-x) + (cy-y)*(cy-y)
-    # if this room is closer than any we've found
-    if dist < minDist
-      minDist = dist
-      nearestRoom = ent
-  # return the room nearest to the provided coordinates
-  return nearestRoom
-
-exports.getPlayer = ->
-  ents = world.find "player"
-  for ent in ents
-    return ent
-  return null
-
-exports.getRandomName = (x, y, z) ->
-  {firstNames} = require "../data/firstNames"
-  {lastNames} = require "../data/lastNames"
-  return "#{firstNames.random()} #{lastNames.random()}"
-
-exports.getTick = ->
-  ents = world.find "gameClock"
-  for ent in ents
-    return ent.gameClock.moves
 
 exports.order = (x1, y1, x2, y2) ->
   # NOTE: the map generator can provide unordered coordinates

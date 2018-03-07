@@ -15,14 +15,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{STATION_SIZE} = require "./config"
+{NUM_ALIENS, NUM_CREW, STATION_SIZE} = require "./config"
 
 helper = require "./helper"
 
+{Alien} = require "./comp/Alien"
 {AlienShip} = require "./comp/AlienShip"
 {Area} = require "./comp/Area"
 {Camera} = require "./comp/Camera"
 {Corridor} = require "./comp/Corridor"
+{Crew} = require "./comp/Crew"
 {Door} = require "./comp/Door"
 {Room} = require "./comp/Room"
 {GameClock} = require "./comp/GameClock"
@@ -182,6 +184,40 @@ exports.create = (world) ->
   for i in [2...STATION_SIZE.LEVELS]
     addLiftToLevel world, i, Lift.UP
     addLiftToLevel world, i, Lift.DOWN
+
+  # create station crew members
+  for i in [1..NUM_CREW]
+    # pick a floor not the top or bottom
+    cz = ROT.RNG.getUniformInt 2, STATION_SIZE.LEVELS-1
+    roomEnt = helper.getRoomOnLevel cz
+    # find a spot within the room
+    {area} = roomEnt
+    cx = ROT.RNG.getUniformInt area.x1, area.x2
+    cy = ROT.RNG.getUniformInt area.y1, area.y2
+    # create a crew member there
+    build world,
+      crew: new Crew()
+      glyph: new Glyph "C", "#77a", "#000"
+      name: new Name helper.getRandomName()
+      obstacle: new Obstacle()
+      position: new Position cx, cy, cz
+
+  # create aliens
+  for i in [1..NUM_ALIENS]
+    # pick a floor not the bottom 2
+    cz = ROT.RNG.getUniformInt 1, STATION_SIZE.LEVELS-2
+    roomEnt = helper.getRoomOnLevel cz
+    # find a spot within the room
+    {area} = roomEnt
+    cx = ROT.RNG.getUniformInt area.x1, area.x2
+    cy = ROT.RNG.getUniformInt area.y1, area.y2
+    # create an alien there
+    build world,
+      alien: new Alien()
+      glyph: new Glyph "S", "#696", "#000"
+      name: new Name "Alien"
+      obstacle: new Obstacle()
+      position: new Position cx, cy, cz
 
 #----------------------------------------------------------------------
 # end of creator.coffee

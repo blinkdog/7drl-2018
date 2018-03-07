@@ -21,13 +21,18 @@ audio = require "./audio"
 creator = require "./creator"
 helper = require "./helper"
 
+{AlienThinkSystem} = require "./sys/AlienThinkSystem"
+{CrewThinkSystem} = require "./sys/CrewThinkSystem"
 {DoorSystem} = require "./sys/DoorSystem"
 {DrawingSystem} = require "./sys/DrawingSystem"
 {InputSystem} = require "./sys/InputSystem"
 
+alienThinkSystem = null
+crewThinkSystem = null
 doorSystem = null
 drawingSystem = null
 inputSystem = null
+
 world = null
 
 loopAgain = false
@@ -45,6 +50,8 @@ mainLoop = ->
   loopRunning = true
   # TODO: Run the game's main loop here
   inputSystem.run()
+  crewThinkSystem.run()
+  alienThinkSystem.run()
   doorSystem.run()
   drawingSystem.run()
   # drop the loop flag
@@ -72,6 +79,8 @@ exports.run = ->
   helper.setWorld world
   creator.create world
   # create the systems that will animate our world
+  alienThinkSystem = new AlienThinkSystem world
+  crewThinkSystem = new CrewThinkSystem world
   doorSystem = new DoorSystem world
   drawingSystem = new DrawingSystem world
   inputSystem = new InputSystem world
