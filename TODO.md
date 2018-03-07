@@ -11,11 +11,16 @@ A roadmap for working on the project
 * [X] Door open/close command
 * [X] Message Scrollback
 * [X] Lifts between station floors
-* [ ] Alien Ship
+* [X] The Alien Ship
 * [ ] Moving Aliens
+* [ ] Attacking Aliens
+* [ ] Items
+* [ ] Method to destroy The Alien Ship
+* [ ] Environmentals
+  * [ ] Room/Corridor Temperature
+  * [ ] Room/Corridor Oxygen
+  * [ ] Room/Corridor Radiation
+* [ ] Spreading environmentals through open doors
 
 ## Wishlist
 * [ ] Schrödinger's Items
-
-## Dev Chores
-* [ ] Remove unnecessary lodash imports

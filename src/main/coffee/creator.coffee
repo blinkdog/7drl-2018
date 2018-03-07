@@ -19,6 +19,7 @@
 
 helper = require "./helper"
 
+{AlienShip} = require "./comp/AlienShip"
 {Area} = require "./comp/Area"
 {Camera} = require "./comp/Camera"
 {Corridor} = require "./comp/Corridor"
@@ -155,11 +156,23 @@ exports.create = (world) ->
 
   # pick a ship room on the top floor
   ents = world.find [ "room" ]
-  ents.filter (x) ->
+  ents = ents.filter (x) ->
     return false if x.area.z isnt 1
     return true
   shipRoomEnt = ents.random()
   world.addComponent shipRoomEnt, "shipRoom", new ShipRoom()
+
+  # create the alien ship
+  {area} = shipRoomEnt
+  ax = ROT.RNG.getUniformInt area.x1, area.x2
+  ay = ROT.RNG.getUniformInt area.y1, area.y2
+  az = area.z
+  build world,
+    alienShip: new AlienShip()
+    glyph: new Glyph "A", "#000", "#0f0"
+    name: new Name "The Alien Ship"
+    obstacle: new Obstacle()
+    position: new Position ax, ay, az
 
   # create lift on the top and bottom floors
   addLiftToLevel world, STATION_SIZE.LEVELS, Lift.UP
