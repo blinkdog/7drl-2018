@@ -29,8 +29,10 @@ act = (world) ->
   # for each alien in the world
   ents = world.find "alien"
   for ent in ents
-    {x,y,z} = ent.position
+    # dead aliens don't think
+    continue if ent.corspe?
     # mill about randomly
+    {x,y,z} = ent.position
     x-- if ROT.RNG.getUniform() < 0.5
     x++ if ROT.RNG.getUniform() < 0.5
     y-- if ROT.RNG.getUniform() < 0.5

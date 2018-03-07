@@ -1,4 +1,4 @@
-# config.coffee
+# OldHealth.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,30 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-exports.DISPLAY_SIZE =
-  WIDTH: 80
-  HEIGHT: 30
-
-exports.DOOR_CLOSE_TICKS = 3
-
-# DEBUG: This just hurts the player until they die; don't enable!
-exports.FLOODED_WITH_RADIATION = false
-
-exports.MESSAGE_HEIGHT = 4
-
-exports.STATION_SIZE =
-  WIDTH: 80
-  HEIGHT: 25
-  LEVELS: 10
-
-exports.WALL =
-  GLYPH: " "
-  FG: "#777"
-  BG: "#111"
-
-exports.NUM_ALIENS = exports.STATION_SIZE.LEVELS*2
-
-exports.NUM_CREW = exports.STATION_SIZE.LEVELS
+class exports.OldHealth
+  constructor: (@hp) ->
+    @hp = 100 if not @hp?
 
 #----------------------------------------------------------------------
-# end of config.coffee
+# end of OldHealth.coffee

@@ -22,16 +22,20 @@ creator = require "./creator"
 helper = require "./helper"
 
 {AlienThinkSystem} = require "./sys/AlienThinkSystem"
+{CorpseSystem} = require "./sys/CorpseSystem"
 {CrewThinkSystem} = require "./sys/CrewThinkSystem"
 {DoorSystem} = require "./sys/DoorSystem"
 {DrawingSystem} = require "./sys/DrawingSystem"
 {InputSystem} = require "./sys/InputSystem"
+{RadiationSystem} = require "./sys/RadiationSystem"
 
 alienThinkSystem = null
+corpseSystem = null
 crewThinkSystem = null
 doorSystem = null
 drawingSystem = null
 inputSystem = null
+radiationSystem = null
 
 world = null
 
@@ -53,6 +57,8 @@ mainLoop = ->
   crewThinkSystem.run()
   alienThinkSystem.run()
   doorSystem.run()
+  radiationSystem.run()
+  corpseSystem.run()
   drawingSystem.run()
   # drop the loop flag
   loopRunning = false
@@ -80,10 +86,12 @@ exports.run = ->
   creator.create world
   # create the systems that will animate our world
   alienThinkSystem = new AlienThinkSystem world
+  corpseSystem = new CorpseSystem world
   crewThinkSystem = new CrewThinkSystem world
   doorSystem = new DoorSystem world
   drawingSystem = new DrawingSystem world
   inputSystem = new InputSystem world
+  radiationSystem = new RadiationSystem world
   # run the main loop
   mainLoop()
 

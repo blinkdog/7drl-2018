@@ -21,8 +21,10 @@ class exports.GameMode
 
   @HELP = "Help"             # looking at the help screen for commands
   @LOOK = "Look"             # using the look command to examine the map
+  @LOSE = "Lose"             # the player has lost the game
   @MESSAGES = "Messages"     # reviewing the log of game messages
   @PLAY = "Play"             # taking action as the protagonist
+  @WIN = "Win"               # the player has won the game
 
 #----------------------------------------------------------------------
 # end of GameMode.coffee

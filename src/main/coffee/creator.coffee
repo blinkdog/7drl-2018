@@ -30,11 +30,13 @@ helper = require "./helper"
 {GameClock} = require "./comp/GameClock"
 {GameMode} = require "./comp/GameMode"
 {Glyph} = require "./comp/Glyph"
+{Health} = require "./comp/Health"
 {Lift} = require "./comp/Lift"
 {LiftRoom} = require "./comp/LiftRoom"
 {Messages} = require "./comp/Messages"
 {Name} = require "./comp/Name"
 {Obstacle} = require "./comp/Obstacle"
+{OldHealth} = require "./comp/OldHealth"
 {Player} = require "./comp/Player"
 {Position} = require "./comp/Position"
 {ShipRoom} = require "./comp/ShipRoom"
@@ -131,30 +133,28 @@ exports.create = (world) ->
       world.addComponent ent, "glyph", glyph
 
   # create our protagonist
-  ent = world.createEntity()
-  glyph = new Glyph "@"
-  world.addComponent ent, "glyph", glyph
-  name = new Name helper.getRandomName()
-  world.addComponent ent, "name", name
-  obstacle = new Obstacle()
-  world.addComponent ent, "obstacle", obstacle
-  player = new Player()
-  world.addComponent ent, "player", player
   startRoomEnt = helper.getNearestRoom 0, STATION_SIZE.HEIGHT, STATION_SIZE.LEVELS
   world.addComponent startRoomEnt, "startRoom", new StartRoom()
   {area} = startRoomEnt
   roomX = Math.floor (area.x1+area.x2) / 2
   roomY = Math.floor (area.y1+area.y2) / 2
-  position = new Position roomX, roomY, STATION_SIZE.LEVELS
-  world.addComponent ent, "position", position
-
-  # create our camera
-  ent = world.createEntity()
-  camera = new Camera position.x, position.y, position.z
-  world.addComponent ent, "camera", camera
+  build world,
+    glyph: new Glyph "@"
+    health: new Health()
+    name: new Name helper.getRandomName()
+    obstacle: new Obstacle()
+    oldHealth: new OldHealth()
+    player: new Player()
+    position: new Position roomX, roomY, STATION_SIZE.LEVELS
 
   # add a message to the world about our protagonist
+  {name} = helper.getPlayer()
   helper.addMessage "I am #{name.name}, station cargo handler."
+
+  # create our camera
+  {position} = helper.getPlayer()
+  build world,
+    camera: new Camera position.x, position.y, position.z
 
   # pick a ship room on the top floor
   ents = world.find [ "room" ]
@@ -198,6 +198,7 @@ exports.create = (world) ->
     build world,
       crew: new Crew()
       glyph: new Glyph "C", "#77a", "#000"
+      health: new Health()
       name: new Name helper.getRandomName()
       obstacle: new Obstacle()
       position: new Position cx, cy, cz
@@ -215,6 +216,7 @@ exports.create = (world) ->
     build world,
       alien: new Alien()
       glyph: new Glyph "S", "#696", "#000"
+      health: new Health()
       name: new Name "Alien"
       obstacle: new Obstacle()
       position: new Position cx, cy, cz

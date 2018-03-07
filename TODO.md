@@ -2,18 +2,11 @@
 A roadmap for working on the project
 
 ## Planned Features
-* [X] Message display
-* [X] Status line
-* [X] Single level map
-* [X] Scrolling map
-* [X] Look command under cursor
-* [X] Check walls and doors for map movement
-* [X] Door open/close command
-* [X] Message Scrollback
 * [X] Lifts between station floors
 * [X] The Alien Ship
 * [X] Moving Aliens
 * [X] Moving Station Crew
+* [X] Health, Injury, and Death
 * [ ] Attacking Aliens
 * [ ] Following/Defending Station Crew
 * [ ] Items

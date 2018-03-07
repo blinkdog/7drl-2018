@@ -69,7 +69,7 @@ draw[GameMode.MESSAGES] = (world) ->
   drawMessageLog world, camera
   drawStatusLine world, camera
 
-draw[GameMode.PLAY] = (world) ->
+draw[GameMode.PLAY] = draw[GameMode.LOSE] = (world) ->
   # get the position of the camera
   camera = getCamera()
   # draw everything that needs to be drawn
@@ -231,28 +231,38 @@ drawStatusLine = (world, camera) ->
   # determine where the camera is looking at this time
   {x,y,z} = camera
   # determine where in the world the player is currently situated
-  ents = world.find [ "name", "player", "position" ]
+  ents = world.find "player"
   for ent in ents
     {name} = ent.name
+    {hp} = ent.health
+    oldHP = ent.oldHealth.hp
     # draw some status text
     mode = helper.getGameMode()
     switch mode
       when GameMode.HELP
-        STATUS_MSG = "%b{#777}%c{#000}[Help] Level:#{z} (#{x},#{y})"
+        STATUS_MSG = "%b{#777}%c{#000}[Help] HP:#{hp} Level:#{z} (#{x},#{y})"
       when GameMode.LOOK
         observed = helper.getNameAt getCamera()
-        STATUS_MSG = "%b{#777}%c{#000}[Look] Level:#{z} (#{x},#{y}) #{observed}"
+        STATUS_MSG = "%b{#777}%c{#000}[Look] HP:#{hp} Level:#{z} (#{x},#{y}) #{observed}"
+      when GameMode.LOSE
+        STATUS_MSG = "%b{#777}%c{#000}[#{name}] DEAD Level:#{z} (#{x},#{y})"
       when GameMode.MESSAGES
         {log} = helper.getMessages().messages
         STATUS_MSG = "%b{#777}%c{#000}[Message Log] #{y+1}/#{log.length}"
       when GameMode.PLAY
-        STATUS_MSG = "%b{#777}%c{#000}[#{name}] Level:#{z} (#{x},#{y})"
+        STATUS_MSG = "%b{#777}%c{#000}[#{name}] "
+        STATUS_MSG += "%b{#700}%c{#000}" if hp < oldHP
+        STATUS_MSG += "HP:#{hp}"
+        STATUS_MSG += "%b{#777}%c{#000} Level:#{z} (#{x},#{y})"
     display.drawText 0, STATUS_Y, STATUS_MSG
     HELP_MSG = "[?] Help"
     HELP_MSG = "[X] Exit Help" if mode is GameMode.HELP
     HELP_MSG = "[X] Exit Look" if mode is GameMode.LOOK
+    HELP_MSG = "" if mode is GameMode.LOSE
     HELP_MSG = "[X] Exit Message Log" if mode is GameMode.MESSAGES
     display.drawText DISPLAY_SIZE.WIDTH-(HELP_MSG.length+1), STATUS_Y, "%b{#777}%c{#000}#{HELP_MSG}"
+    # update our last health indicator
+    ent.oldHealth.hp = ent.health.hp
 
 drawWalls = (world, camera) ->
   # find the view frustum in camera space

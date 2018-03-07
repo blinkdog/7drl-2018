@@ -1,4 +1,4 @@
-# CrewThinkSystem.coffee
+# RadiationSystem.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
+{FLOODED_WITH_RADIATION} = require "./config"
+
 helper = require "../helper"
 
 {System} = require "./System"
@@ -26,27 +28,18 @@ act = (world) ->
   currentTick = helper.getTick()
   # bail if the game hasn't advanced at all
   return if currentTick <= lastTick
-  # for each crew in the world
-  ents = world.find "crew"
-  for ent in ents
-    # dead crew don't think
-    continue if ent.corspe?
-    # mill about randomly
-    {x,y,z} = ent.position
-    x-- if ROT.RNG.getUniform() < 0.5
-    x++ if ROT.RNG.getUniform() < 0.5
-    y-- if ROT.RNG.getUniform() < 0.5
-    y++ if ROT.RNG.getUniform() < 0.5
-    walk = helper.isWalkable x,y,z
-    if walk.ok
-      ent.position.x = x
-      ent.position.y = y
-      ent.position.z = z
+  # find the player
+  player = helper.getPlayer()
+  # if the station is flooded with radiation
+  if FLOODED_WITH_RADIATION
+    # subject the player to radiation damage
+    player.health.hp--
+    player.health.rads++
   # mark that we've processed this tick
   lastTick = currentTick
 
-class exports.CrewThinkSystem extends System
+class exports.RadiationSystem extends System
   run: -> act @world
 
 #----------------------------------------------------------------------
-# end of CrewThinkSystem.coffee
+# end of RadiationSystem.coffee

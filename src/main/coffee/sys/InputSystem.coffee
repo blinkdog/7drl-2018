@@ -62,6 +62,8 @@ handle[GameMode.LOOK] = (world, event) ->
     else
       handleLook world, event.vk
 
+handle[GameMode.LOSE] = (world, event) ->
+
 handle[GameMode.MESSAGES] = (world, event) ->
   switch event.vk
     when "VK_ESCAPE", "VK_Q", "VK_X"
