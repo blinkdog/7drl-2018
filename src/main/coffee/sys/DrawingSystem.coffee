@@ -197,7 +197,15 @@ drawObjects = (world, camera) ->
   frustum = translatePtoL DISPLAY_SIZE, camera
   # find everything that we can draw
   ents = world.find [ "glyph", "position" ]
-  # TODO: may need to sort these ents by fine-Z value (painter's algorithm)
+  # sort them according to some broad criteria
+  ents.sort (a, b) ->
+    # always draw the player last
+    return 1 if a.player?
+    return -1 if b.player?
+    # try to draw the doors last
+    return 1 if a.door?
+    return -1 if b.door?
+  # for each entity, draw it
   for ent in ents
     {glyph, position} = ent
     continue if position.z isnt camera.z

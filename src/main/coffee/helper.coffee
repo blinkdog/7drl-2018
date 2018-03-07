@@ -15,8 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-NUM_LEVELS = 100
-
 world = null
 
 exports.addMessage = (msg) ->
@@ -56,6 +54,15 @@ exports.getGameMode = ->
     return gameMode.mode
   return null
 
+exports.getLiftOnLevel = (level, going) ->
+  ents = world.find [ "lift", "position" ]
+  for ent in ents
+    {x,y,z} = ent.position
+    {dir} = ent.lift
+    if (dir is going) and (z is level)
+      return ent
+  return null
+
 # TODO: Feels like there could be a better position/extents -> name
 #       implementation using entity components, but I don't want to
 #       rewrite it right now
@@ -91,6 +98,16 @@ exports.getNameAt = (pos) ->
       return "Room"
   # can't find anything at that location
   return "Nothing"
+
+exports.getUsableAt = (ux, uy, uz) ->
+  ents = world.find [ "position" ]
+  ents = ents.filter (a) ->
+    # don't include the player in the list of usables
+    return false if a.player?
+    # otherwise check if the position matches
+    {x,y,z} = a.position
+    return (x is ux) and (y is uy) and (z is uz)
+  return ents
 
 exports.haveDoorAt = (dx, dy, dz) ->
   ents = world.find [ "door", "position" ]

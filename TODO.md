@@ -10,7 +10,8 @@ A roadmap for working on the project
 * [X] Check walls and doors for map movement
 * [X] Door open/close command
 * [X] Message Scrollback
-* [ ] Lifts between station floors
+* [X] Lifts between station floors
+* [ ] Alien Ship
 * [ ] Moving Aliens
 
 ## Wishlist

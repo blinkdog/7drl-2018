@@ -1,4 +1,4 @@
-# config.coffee
+# Lift.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,23 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-exports.DISPLAY_SIZE =
-  WIDTH: 80
-  HEIGHT: 30
+class exports.Lift
+  constructor: (@dir) ->
+    @dir = "Up" if not @dir?
 
-exports.DOOR_CLOSE_TICKS = 3
-
-exports.MESSAGE_HEIGHT = 4
-
-exports.STATION_SIZE =
-  WIDTH: 80
-  HEIGHT: 25
-  LEVELS: 10
-
-exports.WALL =
-  GLYPH: "#"
-  FG: "#777"
-  BG: "#111"
+  @UP = "Up"
+  @DOWN = "Down"
 
 #----------------------------------------------------------------------
-# end of config.coffee
+# end of Lift.coffee

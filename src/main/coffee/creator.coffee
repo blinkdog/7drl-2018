@@ -27,25 +27,67 @@ helper = require "./helper"
 {GameClock} = require "./comp/GameClock"
 {GameMode} = require "./comp/GameMode"
 {Glyph} = require "./comp/Glyph"
+{Lift} = require "./comp/Lift"
+{LiftRoom} = require "./comp/LiftRoom"
 {Messages} = require "./comp/Messages"
 {Name} = require "./comp/Name"
 {Obstacle} = require "./comp/Obstacle"
 {Player} = require "./comp/Player"
 {Position} = require "./comp/Position"
+{ShipRoom} = require "./comp/ShipRoom"
+{StartRoom} = require "./comp/StartRoom"
+
+addLiftToLevel = (world, level, dir) ->
+  # find rooms where we could put a lift
+  ents = world.find [ "area", "room" ]
+  ents = ents.filter (x) ->
+    # don't put a lift in the starting room
+    return false if x.startRoom?
+    # don't put a lift in the ending room
+    return false if x.shipRoom?
+    # don't put two lifts in a single room
+    return false if x.liftRoom?
+    # don't put lifts in rooms on other levels
+    return false if x.area.z isnt level
+    # otherwise it should be ok
+    return true
+  # pick one of the candidate rooms at random
+  liftRoomEnt = ents.random()
+  # mark the room as a lift room
+  world.addComponent liftRoomEnt, "liftRoom", new LiftRoom()
+  # figure out where to put the lift in the room
+  {area} = liftRoomEnt
+  lx = ROT.RNG.getUniformInt area.x1, area.x2
+  ly = ROT.RNG.getUniformInt area.y1, area.y2
+  if dir is Lift.UP
+    ch = "/"
+    name = "Lift (Up)"
+  else
+    ch = "\\"
+    name = "Lift (Down)"
+  # create the lift in the world
+  build world,
+    glyph: new Glyph ch, "#777", "#000"
+    lift: new Lift dir
+    name: new Name name
+    position: new Position lx, ly, level
+
+build = (world, spec) ->
+  ent = world.createEntity()
+  for key of spec
+    world.addComponent ent, key, spec[key]
+  return ent
 
 exports.create = (world) ->
   # create our game
-  ent = world.createEntity()
-  gameClock = new GameClock 0
-  world.addComponent ent, "gameClock", gameClock
-  ent = world.createEntity()
-  gameMode = new GameMode()
-  world.addComponent ent, "gameMode", gameMode
+  build world,
+    gameClock: new GameClock 0
+  build world,
+    gameMode: new GameMode GameMode.PLAY
 
   # create the messages log
-  ent = world.createEntity()
-  messages = new Messages()
-  world.addComponent ent, "messages", messages
+  build world,
+    messages: new Messages()
 
   # create the station layout
   for i in [1..STATION_SIZE.LEVELS]
@@ -95,7 +137,9 @@ exports.create = (world) ->
   world.addComponent ent, "obstacle", obstacle
   player = new Player()
   world.addComponent ent, "player", player
-  {area} = helper.getNearestRoom 0, STATION_SIZE.HEIGHT, STATION_SIZE.LEVELS
+  startRoomEnt = helper.getNearestRoom 0, STATION_SIZE.HEIGHT, STATION_SIZE.LEVELS
+  world.addComponent startRoomEnt, "startRoom", new StartRoom()
+  {area} = startRoomEnt
   roomX = Math.floor (area.x1+area.x2) / 2
   roomY = Math.floor (area.y1+area.y2) / 2
   position = new Position roomX, roomY, STATION_SIZE.LEVELS
@@ -107,7 +151,24 @@ exports.create = (world) ->
   world.addComponent ent, "camera", camera
 
   # add a message to the world about our protagonist
-  messages.log.push "I am #{name.name}, station cargo handler."
+  helper.addMessage "I am #{name.name}, station cargo handler."
+
+  # pick a ship room on the top floor
+  ents = world.find [ "room" ]
+  ents.filter (x) ->
+    return false if x.area.z isnt 1
+    return true
+  shipRoomEnt = ents.random()
+  world.addComponent shipRoomEnt, "shipRoom", new ShipRoom()
+
+  # create lift on the top and bottom floors
+  addLiftToLevel world, STATION_SIZE.LEVELS, Lift.UP
+  addLiftToLevel world, 1, Lift.DOWN
+
+  # create lifts on the intermediate floors
+  for i in [2...STATION_SIZE.LEVELS]
+    addLiftToLevel world, i, Lift.UP
+    addLiftToLevel world, i, Lift.DOWN
 
 #----------------------------------------------------------------------
 # end of creator.coffee

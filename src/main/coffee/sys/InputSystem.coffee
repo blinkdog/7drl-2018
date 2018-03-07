@@ -22,6 +22,7 @@ helper = require "../helper"
 {System} = require "./System"
 
 {GameMode} = require "../comp/GameMode"
+{Lift} = require "../comp/Lift"
 
 eventQueue = null
 handle = {}
@@ -143,6 +144,9 @@ handlePlay = (world, vk) ->
     when "VK_UP", "VK_DOWN", "VK_LEFT", "VK_RIGHT", "VK_SPACE"
       handlePlayMove world, vk, ent
       helper.tick()
+    when "VK_U"
+      handlePlayUse world, vk, ent
+      helper.tick()
     else
       helper.addMessage "DEBUG: Unknown key #{vk}"
   helper.setCamera ent.position.x, ent.position.y, ent.position.z
@@ -187,6 +191,46 @@ handlePlayMove = (world, vk, ent) ->
         msg = "You can't move that way."
     else
       msg = "You can't move through the wall."
+  # update game state
+  helper.addMessage msg if msg?
+
+handlePlayUse = (world, vk, playerEnt) ->
+  # determine the current position
+  {x,y,z} = playerEnt.position
+  # get the usable things here
+  ents = helper.getUsableAt x, y, z
+  # if we didn't find anything to use
+  if ents.length is 0
+    helper.addMessage "There is nothing to use here."
+    return false
+  # otherwise, let's pick the first thing on the list
+  ent = ents[0]
+  msg = null
+  # if it's a Lift
+  if ent.lift?
+    # if it's an up-going lift
+    if ent.lift.dir is Lift.UP
+      liftEnt = helper.getLiftOnLevel z-1, Lift.DOWN
+      playerEnt.position.x = liftEnt.position.x
+      playerEnt.position.y = liftEnt.position.y
+      playerEnt.position.z = liftEnt.position.z
+      msg = "You take the Lift up to the next level."
+    # if it's an down-going lift
+    else if ent.lift.dir is Lift.DOWN
+      liftEnt = helper.getLiftOnLevel z+1, Lift.UP
+      playerEnt.position.x = liftEnt.position.x
+      playerEnt.position.y = liftEnt.position.y
+      playerEnt.position.z = liftEnt.position.z
+      msg = "You take the Lift down to the previous level."
+    # now we're really confused
+    else
+      msg = "The Lift is broken and cannot be used."
+  # otherwise?
+  else
+    if ent.name?
+      msg = "You aren't sure how to use the #{ent.name}."
+    else
+      msg = "You aren't sure how to use that."
   # update game state
   helper.addMessage msg if msg?
 
