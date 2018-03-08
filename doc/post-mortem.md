@@ -45,3 +45,28 @@ Sucks. Really, WTF?
 ## Understanding index-ecs
 Don't remove the component that you searched for; the index is
 live and you'll end up with null entities in your iteration.
+
+## Nasty pattern
+I have this pattern in my helper twice now:
+
+xxxForEntities
+  xxxForPositions
+    xxxForCoordinates
+
+It would be nice if I could get some detection going on
+so that I can just pass the thing I have and not worry
+about writing two extra peeling layers.
+
+## Code in haste, debug at leisure
+When testing I attracted the attention of an aggressive
+alien and then got into a long corridor. I held down the
+key so that I could zip along the corridor, and to my
+surprise, I was able to "outrun" the alien by 10+ squares.
+
+This is due to the way the main loop works. It runs and
+it processes an input queue. If that input queue has multiple
+movement keypresses, then each one is processed. After that,
+the alien is awarded a single action, regardless of how many
+player keypresses were processed.
+
+This requires a little thoughtful retooling.

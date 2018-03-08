@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{STATION_SIZE} = require "./config"
-{DISTANCE} = STATION_SIZE
+{DISTANCE} = require("./config").STATION_SIZE
+{OMNISCIENT} = require("./config").DEBUG
 
 world = null
 
@@ -25,6 +25,18 @@ exports.addMessage = (msg) ->
   for ent in ents
     {log} = ent.messages
     log.push msg
+  return true
+
+exports.addMessageAt = (mx, my, mz, msg) ->
+  player = exports.getPlayer()
+  px = player.position.x
+  py = player.position.y
+  pz = player.position.z
+  if exports.canCoordsSee px, py, pz, mx, my, mz
+    return exports.addMessage msg
+  if OMNISCIENT
+    return exports.addMessage "(#{mx},#{my},#{mz}): #{msg}"
+  return false
 
 exports.areCoordsAdjacent = (sx, sy, sz, dx, dy, dz) ->
   ax = Math.abs sx-dx
@@ -56,17 +68,9 @@ exports.canDoorClose = (doorEnt) ->
   # having checked all the entities, the door is allowed to close
   return true
 
-exports.canSee = (s, d) ->
-  # we can't see ourselves
-  return false if d is s
+exports.canCoordsSee = (sx, sy, sz, dx, dy, dz) ->
   # we can't see things on a diffrent floor
-  return false if d.position.z isnt s.position.z
-  # determine where we are
-  sz = s.position.z
-  sx = s.position.x
-  sy = s.position.y
-  dx = d.position.x
-  dy = d.position.y
+  return false if dz isnt sz
   # now we do fov calculations
   lightPasses = (x,y) ->
     walk = exports.isWalkable x, y, sz
@@ -77,6 +81,12 @@ exports.canSee = (s, d) ->
     if (x is dx) and (y is dy)
       seen = true
   return seen
+
+exports.canEntitiesSee = (s, d) ->
+  return exports.canPositionsSee s.position, d.position
+
+exports.canPositionsSee = (s, d) ->
+  return exports.canCoordsSee s.x, s.y, s.z, d.x, d.y, d.z
 
 exports.getCamera = ->
   ents = world.find "camera"

@@ -15,6 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
+exports.DEBUG =
+  # This just hurts the player until they die; don't enable!
+  FLOODED_WITH_RADIATION: false
+  # all messages are observed, not just the ones in player view
+  OMNISCIENT: true
+
 exports.DISPLAY_SIZE =
   WIDTH: 80
   HEIGHT: 30
@@ -30,9 +36,6 @@ exports.DOOR =
     BG: "#000"
 
 exports.DOOR_CLOSE_TICKS = 3
-
-# DEBUG: This just hurts the player until they die; don't enable!
-exports.FLOODED_WITH_RADIATION = false
 
 exports.MESSAGE_HEIGHT = 4
 

@@ -17,6 +17,7 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 * 091: Moving Aliens and Crew
 * 089: Health, Injury, and Death
 * 083: Attacking Aliens
+* 070: Observed and hidden messages
 
 ## Thanks
 * Darius Kazemi for [Corpora](https://github.com/dariusk/corpora); names from census data

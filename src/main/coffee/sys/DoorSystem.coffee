@@ -35,6 +35,9 @@ act = (world) ->
   ents = world.find "door"
   for ent in ents
     {door} = ent
+    ax = ent.position.x
+    ay = ent.position.y
+    az = ent.position.z
     # if the door has been marked to open
     if door.openingAfter?
       if door.openingAfter <= currentTick
@@ -45,7 +48,7 @@ act = (world) ->
         glyph = new Glyph DOOR.OPEN.CH, DOOR.OPEN.FG, DOOR.OPEN.BG
         ent.glyph = glyph
         world.removeComponent ent, "obstacle"
-        helper.addMessage "The door opens."
+        helper.addMessageAt ax, ay, az, "The door opens."
     # if the door has been marked to close
     if door.closingAfter?
       if door.closingAfter <= currentTick
@@ -56,10 +59,10 @@ act = (world) ->
           glyph = new Glyph DOOR.CLOSED.CH, DOOR.CLOSED.FG, DOOR.CLOSED.BG
           ent.glyph = glyph
           world.addComponent ent, "obstacle", new Obstacle()
-          helper.addMessage "The door closes."
+          helper.addMessageAt ax, ay, az, "The door closes."
         else
           door.closingAfter = currentTick + DOOR_CLOSE_TICKS
-          helper.addMessage "Unable to close, the door emits a warning beep."
+          helper.addMessageAt ax, ay, az, "Unable to close, the door emits a warning beep."
   # mark that we've processed this tick
   lastTick = currentTick
 

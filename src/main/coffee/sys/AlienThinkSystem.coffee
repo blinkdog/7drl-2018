@@ -51,7 +51,7 @@ act = (world) ->
         continue if crewEnt.corpse?
         continue if crewEnt.health.hp < 1
         # if the alien can see the crew member
-        if helper.canSee ent, crewEnt
+        if helper.canEntitiesSee ent, crewEnt
           world.addComponent ent, "target", new Target crewEnt
           break
 

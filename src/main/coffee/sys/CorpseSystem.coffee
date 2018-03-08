@@ -31,8 +31,11 @@ act = (world) ->
     continue if ent.corpse?
     # if their health dipped below zero
     {hp} = ent.health
+    ax = ent.position.x
+    ay = ent.position.y
+    az = ent.position.z
     if hp < 1
-      helper.addMessage "#{ent.name.name} falls to the floor dead."
+      helper.addMessageAt ax, ay, az, "#{ent.name.name} falls to the floor dead."
       # set their hp to exactly zero
       ent.health.hp = 0
       # mark them as a corpse

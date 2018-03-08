@@ -21,9 +21,9 @@ helper = require "../helper"
 
 lastTick = 0
 
-stopAttacking = []
-
 act = (world) ->
+  # we'll need to remove the 'attacking' component later
+  stopAttacking = []
   # determine which tick it is
   currentTick = helper.getTick()
   # bail if the game hasn't advanced at all
@@ -31,25 +31,22 @@ act = (world) ->
   # find any attacking entities
   ents = world.find "attacking"
   for ent in ents
+    # we'll need to remove the 'attacking' component later
+    stopAttacking.push ent
     # if no target is specified, cancel the attack
-    if not ent.target?
-      stopAttacking.push ent
-      continue
+    continue if not ent.target?
     # if the target has no health, cancel the attack
     targetEnt = ent.target.ent
-    if not targetEnt.health?
-      stopAttacking.push ent
-      continue
-    if targetEnt.health.hp < 1
-      stopAttacking.push ent
-      continue
+    continue if not targetEnt.health?
+    continue if targetEnt.health.hp < 1
     # if the target is already dead, cancel the attack
-    if targetEnt.corpse?
-      stopAttacking.push ent
-      continue
+    continue if targetEnt.corpse?
     # if the attacker aims well enough to hit
     acs = ent.combatStats
     dcs = targetEnt.combatStats
+    ax = ent.position.x
+    ay = ent.position.y
+    az = ent.position.z
     if ROT.RNG.getPercentage() <= acs.attack
       # if the defender fails to defend
       if ROT.RNG.getPercentage() > dcs.defense
@@ -57,16 +54,14 @@ act = (world) ->
         dmg = Math.floor(ROT.RNG.getUniform() * acs.strength)+1
         targetEnt.health.hp -= dmg
         targetEnt.health.hurt += dmg
-        helper.addMessage "#{ent.name.name} inflicts #{dmg} points of damage on #{targetEnt.name.name}"
+        helper.addMessageAt ax, ay, az, "#{ent.name.name} inflicts #{dmg} points of damage on #{targetEnt.name.name}"
       else
-        helper.addMessage "#{targetEnt.name.name} narrowly avoids the attack by #{ent.name.name}."
+        helper.addMessageAt ax, ay, az, "#{targetEnt.name.name} narrowly avoids the attack by #{ent.name.name}."
     else
-      helper.addMessage "#{ent.name.name} missed #{targetEnt.name.name}."
-    # in any case, this attack is over
-    stopAttacking.push ent
+      helper.addMessageAt ax, ay, az, "#{ent.name.name} missed #{targetEnt.name.name}."
   # mark that we've processed this tick
   lastTick = currentTick
-  # remove the attacking component from all resolved attacks
+  # remove the attacking component from all entities
   for ent in stopAttacking
     world.removeComponent ent, "attacking"
 
