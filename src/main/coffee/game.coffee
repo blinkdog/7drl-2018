@@ -28,48 +28,11 @@ helper = require "./helper"
 {DoorSystem} = require "./sys/DoorSystem"
 {DrawingSystem} = require "./sys/DrawingSystem"
 {InputSystem} = require "./sys/InputSystem"
+{PhysicsSystem} = require "./sys/PhysicsSystem"
 {RadiationSystem} = require "./sys/RadiationSystem"
 
-alienThinkSystem = null
-combatSystem = null
-corpseSystem = null
-crewThinkSystem = null
-doorSystem = null
-drawingSystem = null
-inputSystem = null
-radiationSystem = null
-
+engine = null
 world = null
-
-loopAgain = false
-loopRunning = false
-
-exports.next = ->
-  if loopRunning
-    loopAgain = true
-  else
-    loopRunning = true
-    setTimeout (-> mainLoop()), 1
-
-mainLoop = ->
-  # raise the loop flag
-  loopRunning = true
-  # TODO: Run the game's main loop here
-  inputSystem.run()
-  crewThinkSystem.run()
-  alienThinkSystem.run()
-  doorSystem.run()
-  radiationSystem.run()
-  combatSystem.run()
-  corpseSystem.run()
-  drawingSystem.run()
-  # drop the loop flag
-  loopRunning = false
-  # if something set the loop again flag, do that
-  if loopAgain
-    loopAgain = false
-    loopRunning = true
-    setTimeout (-> mainLoop()), 1
 
 preFlightChecks = ->
   return "rot.js is not supported" if not ROT.isSupported()
@@ -87,19 +50,24 @@ exports.run = ->
   world = new World()
   helper.setWorld world
   creator.create world
+  # create the engine to run our world
+  scheduler = new ROT.Scheduler.Simple()
+  engine = new ROT.Engine scheduler
   # create the systems that will animate our world
-  alienThinkSystem = new AlienThinkSystem world
-  combatSystem = new CombatSystem world
-  corpseSystem = new CorpseSystem world
-  crewThinkSystem = new CrewThinkSystem world
-  doorSystem = new DoorSystem world
-  drawingSystem = new DrawingSystem world
-  inputSystem = new InputSystem world
-  radiationSystem = new RadiationSystem world
+  scheduler.add new DrawingSystem(world), true
+  scheduler.add new InputSystem(world, engine), true
+  scheduler.add new PhysicsSystem(world, engine), true
+  scheduler.add new CrewThinkSystem(world), true
+  scheduler.add new AlienThinkSystem(world), true
+  scheduler.add new DoorSystem(world), true
+  scheduler.add new RadiationSystem(world), true
+  scheduler.add new CombatSystem(world), true
+  scheduler.add new CorpseSystem(world), true
   # run the main loop
-  mainLoop()
+  engine.start()
 
 # debugging in browser
+exports.engine = engine
 exports.world = world
 window.API.game = exports if window?.API?
 

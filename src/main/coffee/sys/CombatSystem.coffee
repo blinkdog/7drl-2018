@@ -21,7 +21,7 @@ helper = require "../helper"
 
 lastTick = 0
 
-act = (world) ->
+run = (world, engine) ->
   # we'll need to remove the 'attacking' component later
   stopAttacking = []
   # determine which tick it is
@@ -66,7 +66,7 @@ act = (world) ->
     world.removeComponent ent, "attacking"
 
 class exports.CombatSystem extends System
-  run: -> act @world
+  act: -> run @world, @engine
 
 #----------------------------------------------------------------------
 # end of CombatSystem.coffee

@@ -21,7 +21,7 @@ helper = require "../helper"
 
 lastTick = 0
 
-act = (world) ->
+run = (world, engine) ->
   # determine which tick it is
   currentTick = helper.getTick()
   # bail if the game hasn't advanced at all
@@ -48,7 +48,7 @@ act = (world) ->
   lastTick = currentTick
 
 class exports.CrewThinkSystem extends System
-  run: -> act @world
+  act: -> run @world, @engine
 
 #----------------------------------------------------------------------
 # end of CrewThinkSystem.coffee

@@ -20,6 +20,8 @@ exports.DEBUG =
   FLOODED_WITH_RADIATION: false
   # all messages are observed, not just the ones in player view
   OMNISCIENT: true
+  # some glyphs are replaced with unicode glyphs
+  UNICODE: true
 
 exports.DISPLAY_SIZE =
   WIDTH: 80
@@ -55,6 +57,9 @@ exports.WALL =
 exports.NUM_ALIENS = exports.STATION_SIZE.LEVELS*2
 
 exports.NUM_CREW = exports.STATION_SIZE.LEVELS
+
+if exports.DEBUG.UNICODE
+  exports.DOOR.CLOSED.CH = "\uD83D\uDEAA"
 
 #----------------------------------------------------------------------
 # end of config.coffee

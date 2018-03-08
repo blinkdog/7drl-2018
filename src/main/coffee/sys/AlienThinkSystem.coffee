@@ -24,7 +24,7 @@ helper = require "../helper"
 
 lastTick = 0
 
-act = (world) ->
+run = (world, engine) ->
   # determine which tick it is
   currentTick = helper.getTick()
   # bail if the game hasn't advanced at all
@@ -128,7 +128,7 @@ millAbout = (ent) ->
     ent.position.z = z
 
 class exports.AlienThinkSystem extends System
-  run: -> act @world
+  act: -> run @world, @engine
 
 #----------------------------------------------------------------------
 # end of AlienThinkSystem.coffee

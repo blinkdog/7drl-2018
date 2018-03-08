@@ -27,7 +27,7 @@ helper = require "../helper"
 display = null
 draw = {}
 
-act = (world) ->
+run = (world, engine) ->
   # first, ensure that we've got a display
   createDisplay() if not display?
   # determine what we're going to draw
@@ -309,7 +309,7 @@ translatePtoL = (dispSize, camera) ->
   return frustum
 
 class exports.DrawingSystem extends System
-  run: -> act @world
+  act: -> run @world, @engine
 
 # unit testing
 exports.translatePtoL = translatePtoL

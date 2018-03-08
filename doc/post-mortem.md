@@ -70,3 +70,16 @@ the alien is awarded a single action, regardless of how many
 player keypresses were processed.
 
 This requires a little thoughtful retooling.
+
+## Missing features in ECS
+Twice I've coded this pattern:
+
+  for entities with component X
+    collect entities
+    ... do stuff with entities ...
+  for entities in collection
+    remove entities
+
+It looks like index-ecs is missing two calls:
+- remove all components of type X
+- remove all entities having component X

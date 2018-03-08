@@ -1,4 +1,4 @@
-# RadiationSystem.coffee
+# PlayerInput.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,31 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{FLOODED_WITH_RADIATION} = require("../config").DEBUG
-
-helper = require "../helper"
-
-{System} = require "./System"
-
-lastTick = 0
-
-run = (world, engine) ->
-  # determine which tick it is
-  currentTick = helper.getTick()
-  # bail if the game hasn't advanced at all
-  return if currentTick <= lastTick
-  # find the player
-  player = helper.getPlayer()
-  # if the station is flooded with radiation
-  if FLOODED_WITH_RADIATION
-    # subject the player to radiation damage
-    player.health.hp--
-    player.health.rads++
-  # mark that we've processed this tick
-  lastTick = currentTick
-
-class exports.RadiationSystem extends System
-  act: -> run @world, @engine
+class exports.PlayerInput
+  constructor: (@event) ->
 
 #----------------------------------------------------------------------
-# end of RadiationSystem.coffee
+# end of PlayerInput.coffee

@@ -2,19 +2,20 @@
 A roadmap for working on the project
 
 ## Planned Features
-* [X] Moving Aliens
 * [X] Moving Station Crew
 * [X] Health, Injury, and Death
 * [X] Attacking Aliens
 * [X] Observed Messages (addMessageAt -> canPlayerSee x,y)
-* [ ] Main Loop / Input Queue Timing Bug
+* [X] Main Loop / Input Queue Timing Bug
 * [ ] Following/Defending Station Crew
-* [ ] Items
+  * [ ] Crew members opening doors
+  * [ ] (Some) aliens opening doors
+* [ ] Look/Take/Drop/Use Items
 * [ ] Method to destroy The Alien Ship
 * [ ] LOS+FOW
+* [ ] Map Key
 * [ ] Weapons
 * [ ] Healing Items
-* [ ] Map Key
 * [ ] Aliens Shapeshifted into Station Crew
 * [ ] Environmentals
   * [ ] Room/Corridor Temperature

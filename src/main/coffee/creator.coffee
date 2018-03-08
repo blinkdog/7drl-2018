@@ -58,6 +58,8 @@ addLiftToLevel = (world, level, dir) ->
     # otherwise it should be ok
     return true
   # pick one of the candidate rooms at random
+  if ents.length < 1
+    throw new Error "not enough rooms on floor #{level}"
   liftRoomEnt = ents.random()
   # mark the room as a lift room
   world.addComponent liftRoomEnt, "liftRoom", new LiftRoom()

@@ -22,7 +22,7 @@ helper = require "../helper"
 {Corpse} = require "../comp/Corpse"
 {GameMode} = require "../comp/GameMode"
 
-act = (world) ->
+run = (world, engine) ->
   # find anything with health
   ents = world.find "health"
   # for each thing that could die
@@ -53,7 +53,7 @@ act = (world) ->
         helper.addMessage "Game Over. Please reload to start a new game."
 
 class exports.CorpseSystem extends System
-  run: -> act @world
+  act: -> run @world, @engine
 
 #----------------------------------------------------------------------
 # end of CorpseSystem.coffee

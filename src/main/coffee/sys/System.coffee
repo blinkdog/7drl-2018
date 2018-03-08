@@ -16,8 +16,8 @@
 #----------------------------------------------------------------------
 
 class exports.System
-  constructor: (@world) ->
-  run: -> console.log "System.run() is a no-op"
+  constructor: (@world, @engine) ->
+  act: -> console.log "System.act() is a no-op"
 
 #----------------------------------------------------------------------
 # end of System.coffee
