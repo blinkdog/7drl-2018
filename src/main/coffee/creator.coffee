@@ -23,6 +23,7 @@ helper = require "./helper"
 {AlienShip} = require "./comp/AlienShip"
 {Area} = require "./comp/Area"
 {Camera} = require "./comp/Camera"
+{CombatStats} = require "./comp/CombatStats"
 {Corridor} = require "./comp/Corridor"
 {Crew} = require "./comp/Crew"
 {Door} = require "./comp/Door"
@@ -83,6 +84,18 @@ build = (world, spec) ->
     world.addComponent ent, key, spec[key]
   return ent
 
+rollAlienCombatStats = ->
+  attack = 50 + ROT.RNG.getUniformInt -20, 20
+  defense = 30 + ROT.RNG.getUniformInt -10, 10
+  strength = 50 + ROT.RNG.getUniformInt -20, 20
+  return new CombatStats attack, defense, strength
+
+rollCrewCombatStats = ->
+  attack = 50 + ROT.RNG.getUniformInt -20, 20
+  defense = 40 + ROT.RNG.getUniformInt -10, 10
+  strength = 30 + ROT.RNG.getUniformInt -5, 5
+  return new CombatStats attack, defense, strength
+
 exports.create = (world) ->
   # create our game
   build world,
@@ -139,6 +152,8 @@ exports.create = (world) ->
   roomX = Math.floor (area.x1+area.x2) / 2
   roomY = Math.floor (area.y1+area.y2) / 2
   build world,
+    combatStats: rollCrewCombatStats()
+    crew: new Crew()
     glyph: new Glyph "@"
     health: new Health()
     name: new Name helper.getRandomName()
@@ -188,7 +203,9 @@ exports.create = (world) ->
   # create station crew members
   for i in [1..NUM_CREW]
     # pick a floor not the top or bottom
-    cz = ROT.RNG.getUniformInt 2, STATION_SIZE.LEVELS-1
+    #cz = ROT.RNG.getUniformInt 2, STATION_SIZE.LEVELS-1
+    # DEBUG: pick any floor
+    cz = ROT.RNG.getUniformInt 1, STATION_SIZE.LEVELS
     roomEnt = helper.getRoomOnLevel cz
     # find a spot within the room
     {area} = roomEnt
@@ -196,6 +213,7 @@ exports.create = (world) ->
     cy = ROT.RNG.getUniformInt area.y1, area.y2
     # create a crew member there
     build world,
+      combatStats: rollCrewCombatStats()
       crew: new Crew()
       glyph: new Glyph "C", "#77a", "#000"
       health: new Health()
@@ -206,7 +224,9 @@ exports.create = (world) ->
   # create aliens
   for i in [1..NUM_ALIENS]
     # pick a floor not the bottom 2
-    cz = ROT.RNG.getUniformInt 1, STATION_SIZE.LEVELS-2
+    #cz = ROT.RNG.getUniformInt 1, STATION_SIZE.LEVELS-2
+    # DEBUG: pick any floor
+    cz = ROT.RNG.getUniformInt 1, STATION_SIZE.LEVELS
     roomEnt = helper.getRoomOnLevel cz
     # find a spot within the room
     {area} = roomEnt
@@ -215,6 +235,7 @@ exports.create = (world) ->
     # create an alien there
     build world,
       alien: new Alien()
+      combatStats: rollAlienCombatStats()
       glyph: new Glyph "S", "#696", "#000"
       health: new Health()
       name: new Name "Alien"

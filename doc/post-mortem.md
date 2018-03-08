@@ -41,3 +41,7 @@ the pressure of the deadline.
 
 ## Editor going 100% CPU and non-responsive
 Sucks. Really, WTF?
+
+## Understanding index-ecs
+Don't remove the component that you searched for; the index is
+live and you'll end up with null entities in your iteration.

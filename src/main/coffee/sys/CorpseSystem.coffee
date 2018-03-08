@@ -32,6 +32,7 @@ act = (world) ->
     # if their health dipped below zero
     {hp} = ent.health
     if hp < 1
+      helper.addMessage "#{ent.name.name} falls to the floor dead."
       # set their hp to exactly zero
       ent.health.hp = 0
       # mark them as a corpse

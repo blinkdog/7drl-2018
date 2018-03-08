@@ -15,6 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
+{STATION_SIZE} = require "./config"
+{DISTANCE} = STATION_SIZE
+
 world = null
 
 exports.addMessage = (msg) ->
@@ -22,6 +25,18 @@ exports.addMessage = (msg) ->
   for ent in ents
     {log} = ent.messages
     log.push msg
+
+exports.areCoordsAdjacent = (sx, sy, sz, dx, dy, dz) ->
+  ax = Math.abs sx-dx
+  ay = Math.abs sy-dy
+  az = Math.abs sz-dz
+  return ((ax <= 1) and (ay <= 1) and (az is 0))
+
+exports.areEntitiesAdjacent = (s, d) ->
+  return exports.arePositionsAdjacent s.position, d.position
+
+exports.arePositionsAdjacent = (s, d) ->
+  return exports.areCoordsAdjacent s.x, s.y, s.z, d.x, d.y, d.z
 
 exports.canDoorClose = (doorEnt) ->
   dx = doorEnt.position.x
@@ -40,6 +55,28 @@ exports.canDoorClose = (doorEnt) ->
         return false
   # having checked all the entities, the door is allowed to close
   return true
+
+exports.canSee = (s, d) ->
+  # we can't see ourselves
+  return false if d is s
+  # we can't see things on a diffrent floor
+  return false if d.position.z isnt s.position.z
+  # determine where we are
+  sz = s.position.z
+  sx = s.position.x
+  sy = s.position.y
+  dx = d.position.x
+  dy = d.position.y
+  # now we do fov calculations
+  lightPasses = (x,y) ->
+    walk = exports.isWalkable x, y, sz
+    return walk.ok
+  fov = new ROT.FOV.PreciseShadowcasting lightPasses
+  seen = false
+  fov.compute sx, sy, DISTANCE, (x, y, r, visibility) ->
+    if (x is dx) and (y is dy)
+      seen = true
+  return seen
 
 exports.getCamera = ->
   ents = world.find "camera"
@@ -136,6 +173,12 @@ exports.getRandomName = (x, y, z) ->
   {firstNames} = require "../data/firstNames"
   {lastNames} = require "../data/lastNames"
   return "#{firstNames.random()} #{lastNames.random()}"
+
+exports.getRoomOnLevel = (z) ->
+  ents = world.find [ "area", "room" ]
+  ents = ents.filter (a) ->
+    return a.area.z is z
+  return ents.random()
 
 exports.getRoomOnLevel = (z) ->
   ents = world.find [ "area", "room" ]

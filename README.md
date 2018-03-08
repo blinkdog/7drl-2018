@@ -16,6 +16,7 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 * 102: The Alien Ship
 * 091: Moving Aliens and Crew
 * 089: Health, Injury, and Death
+* 083: Attacking Aliens
 
 ## Thanks
 * Darius Kazemi for [Corpora](https://github.com/dariusk/corpora); names from census data

@@ -30,7 +30,9 @@ act = (world) ->
   ents = world.find "crew"
   for ent in ents
     # dead crew don't think
-    continue if ent.corspe?
+    continue if ent.corpse?
+    # the player can think for themselves
+    continue if ent.player?
     # mill about randomly
     {x,y,z} = ent.position
     x-- if ROT.RNG.getUniform() < 0.5
