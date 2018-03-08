@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{NUM_ALIENS, NUM_CREW, STATION_SIZE} = require "./config"
+{DOOR, NUM_ALIENS, NUM_CREW, STATION_SIZE} = require "./config"
 
 helper = require "./helper"
 
@@ -115,7 +115,7 @@ exports.create = (world) ->
         ent = world.createEntity()
         door = new Door Door.CLOSED
         world.addComponent ent, "door", door
-        glyph = new Glyph "Z", "#777", "#000"
+        glyph = new Glyph DOOR.CLOSED.CH, DOOR.CLOSED.FG, DOOR.CLOSED.BG
         world.addComponent ent, "glyph", glyph
         obstacle = new Obstacle()
         world.addComponent ent, "obstacle", obstacle

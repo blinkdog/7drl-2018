@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{FLOODED_WITH_RADIATION} = require "./config"
+{FLOODED_WITH_RADIATION} = require "../config"
 
 helper = require "../helper"
 

@@ -19,6 +19,16 @@ exports.DISPLAY_SIZE =
   WIDTH: 80
   HEIGHT: 30
 
+exports.DOOR =
+  CLOSED:
+    CH: "Z"
+    FG: "#555"
+    BG: "#111"
+  OPEN:
+    CH: "."
+    FG: "#777"
+    BG: "#000"
+
 exports.DOOR_CLOSE_TICKS = 3
 
 # DEBUG: This just hurts the player until they die; don't enable!

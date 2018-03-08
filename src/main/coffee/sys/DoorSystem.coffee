@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{DOOR_CLOSE_TICKS} = require "../config"
+{DOOR, DOOR_CLOSE_TICKS} = require "../config"
 
 helper = require "../helper"
 
@@ -42,7 +42,7 @@ act = (world) ->
         door.open = true
         delete door.openingAfter
         door.closingAfter = currentTick + DOOR_CLOSE_TICKS
-        glyph = new Glyph " ", ent.glyph.fg, ent.glyph.bg
+        glyph = new Glyph DOOR.OPEN.CH, DOOR.OPEN.FG, DOOR.OPEN.BG
         ent.glyph = glyph
         world.removeComponent ent, "obstacle"
         helper.addMessage "The door opens."
@@ -53,7 +53,7 @@ act = (world) ->
           # close the door
           door.open = false
           delete door.closingAfter
-          glyph = new Glyph "Z", ent.glyph.fg, ent.glyph.bg
+          glyph = new Glyph DOOR.CLOSED.CH, DOOR.CLOSED.FG, DOOR.CLOSED.BG
           ent.glyph = glyph
           world.addComponent ent, "obstacle", new Obstacle()
           helper.addMessage "The door closes."

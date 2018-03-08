@@ -1,6 +1,6 @@
 {
   "name": "tda616",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "author": "Patrick Meade <veloxi@ticon.net>",
   "description": "Seven Day Roguelike (7DRL) Challenge 2018",
   "scripts": {
