@@ -24,6 +24,7 @@ class exports.GameMode
   @LOSE = "Lose"             # the player has lost the game
   @MESSAGES = "Messages"     # reviewing the log of game messages
   @PLAY = "Play"             # taking action as the protagonist
+  @TARGET = "Target"         # player is choosing a target
   @WIN = "Win"               # the player has won the game
 
 #----------------------------------------------------------------------

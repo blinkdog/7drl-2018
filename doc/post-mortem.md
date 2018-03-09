@@ -89,3 +89,8 @@ Some of the helper stuff could probably be simplified with
 attributes like "BlocksMovement", "BlocksLineOfSight",
 "StandingInDoorway", "StandingOnLift", "StandingNextToDoor",
 "BottomFloor", "TopFloor", etc...
+
+## Consistency in fine-grained attributes
+Why Camera has its own set of x,y,z instead of being a
+marker interface for an entity that also has a Position?
+Bah... the folly of youth.

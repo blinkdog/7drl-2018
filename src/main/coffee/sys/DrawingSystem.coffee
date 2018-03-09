@@ -33,7 +33,7 @@ run = (world, engine) ->
   createDisplay() if not display?
   # determine what we're going to draw
   mode = helper.getGameMode()
-  draw[mode]?(world)
+  draw[mode](world)
 
 draw[GameMode.HELP] = (world) ->
   # get the position of the camera
@@ -81,6 +81,21 @@ draw[GameMode.PLAY] = draw[GameMode.LOSE] = (world) ->
   drawObjects world, camera
   drawMessages world, camera
   drawStatusLine world, camera
+  # return something reasonable to the caller
+  return true
+
+draw[GameMode.TARGET] = (world) ->
+  # get the position of the camera
+  camera = getCamera()
+  # draw everything that needs to be drawn
+  display.clear()
+  drawWalls world, camera
+  drawMap world, camera
+  drawObjects world, camera
+  drawMessages world, camera
+  drawStatusLine world, camera
+  drawTargetPath world, camera
+  drawLookDot world, camera
   # return something reasonable to the caller
   return true
 
@@ -232,38 +247,75 @@ drawStatusLine = (world, camera) ->
   # determine where the camera is looking at this time
   {x,y,z} = camera
   # determine where in the world the player is currently situated
-  ents = world.find "player"
-  for ent in ents
-    {name} = ent.name
-    {hp} = ent.health
-    oldHP = ent.oldHealth.hp
-    # draw some status text
-    mode = helper.getGameMode()
-    switch mode
-      when GameMode.HELP
-        STATUS_MSG = "%b{#777}%c{#000}[Help] HP:#{hp} Level:#{z} (#{x},#{y})"
-      when GameMode.LOOK
-        observed = helper.getNameAt getCamera()
-        STATUS_MSG = "%b{#777}%c{#000}[Look] HP:#{hp} Level:#{z} (#{x},#{y}) #{observed}"
-      when GameMode.LOSE
-        STATUS_MSG = "%b{#777}%c{#000}[#{name}] DEAD Level:#{z} (#{x},#{y})"
-      when GameMode.MESSAGES
-        {log} = helper.getMessages().messages
-        STATUS_MSG = "%b{#777}%c{#000}[Message Log] #{y+1}/#{log.length}"
-      when GameMode.PLAY
-        STATUS_MSG = "%b{#777}%c{#000}[#{name}] "
-        STATUS_MSG += "%b{#700}%c{#000}" if hp < lastHp
-        STATUS_MSG += "HP:#{hp}"
-        STATUS_MSG += "%b{#777}%c{#000} Level:#{z} (#{x},#{y})"
-    display.drawText 0, STATUS_Y, STATUS_MSG
-    HELP_MSG = "[?] Help"
-    HELP_MSG = "[X] Exit Help" if mode is GameMode.HELP
-    HELP_MSG = "[X] Exit Look" if mode is GameMode.LOOK
-    HELP_MSG = "" if mode is GameMode.LOSE
-    HELP_MSG = "[X] Exit Message Log" if mode is GameMode.MESSAGES
-    display.drawText DISPLAY_SIZE.WIDTH-(HELP_MSG.length+1), STATUS_Y, "%b{#777}%c{#000}#{HELP_MSG}"
-    # record the last hit point total we rendered
-    lastHp = hp
+  ent = helper.getPlayer()
+  {hp} = ent.health
+  {name} = ent.name
+  targetEnt = ent?.target?.ent
+  oldHP = ent.oldHealth.hp
+  # draw some status text
+  mode = helper.getGameMode()
+  STATUS_MSG = "%b{#777}%c{#000}"
+  switch mode
+    when GameMode.HELP
+      STATUS_MSG += "[Help] "
+      STATUS_MSG += "[Target:#{targetEnt.name.name}] " if targetEnt?
+      STATUS_MSG += "HP:#{hp} Level:#{z} (#{x},#{y})"
+    when GameMode.LOOK
+      observed = helper.getNameAt getCamera()
+      STATUS_MSG += "[Look] "
+      STATUS_MSG += "[Target:#{targetEnt.name.name}] " if targetEnt?
+      STATUS_MSG += "HP:#{hp} Level:#{z} (#{x},#{y}) #{observed}"
+    when GameMode.LOSE
+      STATUS_MSG += "[#{name}] DEAD Level:#{z} (#{x},#{y})"
+    when GameMode.MESSAGES
+      {log} = helper.getMessages().messages
+      STATUS_MSG += "[Message Log] #{y+1}/#{log.length}"
+    when GameMode.PLAY
+      STATUS_MSG += "[#{name}] "
+      STATUS_MSG += "[Target:#{targetEnt.name.name}] " if targetEnt?
+      STATUS_MSG += "%b{#700}%c{#000}" if hp < lastHp
+      STATUS_MSG += "HP:#{hp}"
+      STATUS_MSG += "%b{#777}%c{#000} Level:#{z} (#{x},#{y})"
+    when GameMode.TARGET
+      observed = helper.getNameAt getCamera()
+      STATUS_MSG += "[Target] "
+      STATUS_MSG += "[Current:#{targetEnt.name.name}] " if targetEnt?
+      STATUS_MSG += "Cursor:#{observed}"
+    else
+      STATUS_MSG += "[#{mode}] ERROR: UNKNOWN GAME MODE"
+  display.drawText 0, STATUS_Y, STATUS_MSG
+  HELP_MSG = "[?] Help"
+  HELP_MSG = "[X] Exit Help" if mode is GameMode.HELP
+  HELP_MSG = "[X] Exit Look" if mode is GameMode.LOOK
+  HELP_MSG = "" if mode is GameMode.LOSE
+  HELP_MSG = "[X] Exit Message Log" if mode is GameMode.MESSAGES
+  HELP_MSG = "[X] Exit Targeting" if mode is GameMode.TARGET
+  display.drawText DISPLAY_SIZE.WIDTH-(HELP_MSG.length+1), STATUS_Y, "%b{#777}%c{#000}#{HELP_MSG}"
+  # record the last hit point total we rendered
+  lastHp = hp
+
+drawTargetPath = (world, camera) ->
+  frustum = translatePtoL DISPLAY_SIZE, camera
+  # the player is the source of the target path
+  player = helper.getPlayer()
+  sx = player.position.x
+  sy = player.position.y
+  sz = player.position.z
+  # if the player can't see that position, we bail
+  return if not helper.canPositionsSee player.position, camera
+  # we can chase through any passable
+  passableCallback = (x,y) ->
+    walk = helper.isSeeable x, y, sz
+    return true if walk.ok
+    return true if walk.ent?.door?
+    return false
+  # compute a path from the player
+  dijkstra = new ROT.Path.Dijkstra sx, sy, passableCallback
+  # compute a path to the camera
+  dijkstra.compute camera.x, camera.y, (x,y) ->
+    px = x-frustum.x1
+    py = y-frustum.y1
+    display.draw px, py, "*", "#f00", "#000"
 
 drawWalls = (world, camera) ->
   # find the view frustum in camera space

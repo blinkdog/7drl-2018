@@ -2,8 +2,6 @@
 A roadmap for working on the project
 
 ## Planned Features
-* [X] Moving Station Crew
-* [X] Health, Injury, and Death
 * [X] Attacking Aliens
 * [X] Observed Messages (addMessageAt -> canPlayerSee x,y)
 * [X] Main Loop / Input Queue Timing Bug
@@ -12,6 +10,8 @@ A roadmap for working on the project
   * [X] (Some) aliens opening doors
   * [X] Crew members using lifts
   * [X] (Some) aliens using lifts
+* [X] Add Targeting Mode for Player
+* [ ] Add Attack command for Player
 * [ ] Look/Take/Drop/Use Items
 * [ ] Method to destroy The Alien Ship
 * [ ] LOS+FOW

@@ -28,7 +28,7 @@ helper = require "./helper"
 {DoorSystem} = require "./sys/DoorSystem"
 {DrawingSystem} = require "./sys/DrawingSystem"
 {InputSystem} = require "./sys/InputSystem"
-{PhysicsSystem} = require "./sys/PhysicsSystem"
+{PlayerThinkSystem} = require "./sys/PlayerThinkSystem"
 {RadiationSystem} = require "./sys/RadiationSystem"
 
 engine = null
@@ -54,15 +54,15 @@ exports.run = ->
   scheduler = new ROT.Scheduler.Simple()
   engine = new ROT.Engine scheduler
   # create the systems that will animate our world
-  scheduler.add new DrawingSystem(world), true
+  scheduler.add new DrawingSystem(world, engine), true
   scheduler.add new InputSystem(world, engine), true
-  scheduler.add new PhysicsSystem(world, engine), true
-  scheduler.add new CrewThinkSystem(world), true
-  scheduler.add new AlienThinkSystem(world), true
-  scheduler.add new DoorSystem(world), true
-  scheduler.add new RadiationSystem(world), true
-  scheduler.add new CombatSystem(world), true
-  scheduler.add new CorpseSystem(world), true
+  scheduler.add new PlayerThinkSystem(world, engine), true
+  scheduler.add new CrewThinkSystem(world, engine), true
+  scheduler.add new AlienThinkSystem(world, engine), true
+  scheduler.add new DoorSystem(world, engine), true
+  scheduler.add new RadiationSystem(world, engine), true
+  scheduler.add new CombatSystem(world, engine), true
+  scheduler.add new CorpseSystem(world, engine), true
   # run the main loop
   engine.start()
 

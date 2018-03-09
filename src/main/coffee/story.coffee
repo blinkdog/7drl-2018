@@ -8,9 +8,12 @@ exports.COMMAND_LIST = """
   ?                         View Help (**YOU ARE HERE**)
   ESC, Q, X                 Exit Special Modes
   Up, Down, Left, Right     Move
+  A                         Attack Selected Target
   L                         Look Mode
   M                         Review Messages Log
+  T                         Enter Targeting Mode
   U                         Use Lift
+  Enter, Space              Select Target
 """
 
 exports.PLOT_SYNOPSIS = """

@@ -94,6 +94,27 @@ exports.getCamera = ->
     return ent
   return null
 
+exports.getEntsAt = (pos) ->
+  found = []
+  lx = pos.x
+  ly = pos.y
+  lz = pos.z
+  # first look for positions
+  ents = world.find "position"
+  for ent in ents
+    {x, y, z} = ent.position
+    if (lx is x) and (ly is y) and (lz is z)
+      found.push ent
+  # next look for areas
+  ents = world.find "area"
+  for ent in ents
+    {x1, y1, x2, y2, z} = ent.area
+    if (lx >= x1) and (lx <= x2) and (ly >= y1) and (ly <= y2) and (lz is z)
+      found.push ent
+  # return everything we found (if anything)
+  found.sort lookTargetSort
+  return found
+
 exports.getGameMode = ->
   ents = world.find "gameMode"
   for ent in ents
@@ -116,40 +137,25 @@ exports.getMessages = ->
     return ent
   return null
 
-# TODO: Feels like there could be a better position/extents -> name
-#       implementation using entity components, but I don't want to
-#       rewrite it right now
 exports.getNameAt = (pos) ->
-  lx = pos.x
-  ly = pos.y
-  lz = pos.z
-  # first look for objects
-  ents = world.find "position"
-  for ent in ents
-    {x, y, z} = ent.position
-    if (lx is x) and (ly is y) and (lz is z)
-      if ent.door?
-        if ent.door.open
-          return "Door (Open)"
-        else
-          return "Door (Closed)"
-      if ent.name?
-        return ent.name.name
-      else
-        return "An object"
-  # next look for corridors
-  ents = world.find "corridor"
-  for ent in ents
-    {x1, y1, x2, y2, z} = ent.area
-    if (lx >= x1) and (lx <= x2) and (ly >= y1) and (ly <= y2) and (lz is z)
-      return "Corridor"
-  # next look for rooms
-  ents = world.find "room"
-  for ent in ents
-    {x1, y1, x2, y2, z} = ent.area
-    if (lx >= x1) and (lx <= x2) and (ly >= y1) and (ly <= y2) and (lz is z)
-      return "Room"
-  # can't find anything at that location
+  ents = exports.getEntsAt pos
+  if ents.length is 0
+    return "Nothing"
+  ent = ents[0]
+  if ent.corridor
+    return "Corridor"
+  if ent.room
+    return "Room"
+  if ent.door?
+    if ent.door.open
+      return "Door (Open)"
+    else
+      return "Door (Closed)"
+  if ent.position?
+    if ent.name?
+      return ent.name.name
+    else
+      return "An object"
   return "Nothing"
 
 exports.getNearestRoom = (x, y, z) ->
@@ -333,6 +339,28 @@ exports.tick = ->
   ents = world.find "gameClock"
   for ent in ents
     ent.gameClock.moves++
+
+lookTargetSort = (a, b) ->
+  # always sort areas last
+  return 1 if a.area?
+  return -1 if b.area?
+  # sort non-obstacles 2nd to last
+  return -1 if a.obstacle?
+  return 1 if b.obstacle?
+  # sort doors third to last
+  return 1 if a.door?
+  return -1 if b.door?
+  # sort non-player crew fourth to last
+  return 1 if (a.crew?) and (not a.player?)
+  return -1 if (b.crew?) and (not b.player?)
+  # sort aliens fifth to last
+  return 1 if a.alien?
+  return -1 if b.alien?
+  # sort player first
+  return -1 if a.player?
+  return 1 if b.player?
+  # otherwise we're not really sure
+  return 0
 
 #----------------------------------------------------------------------
 # end of helper.coffee

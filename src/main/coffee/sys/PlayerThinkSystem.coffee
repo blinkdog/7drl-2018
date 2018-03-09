@@ -1,4 +1,4 @@
-# PhysicsSystem.coffee
+# PlayerThinkSystem.coffee
 # Copyright 2018 Patrick Meade
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ helper = require "../helper"
 
 {GameMode} = require "../comp/GameMode"
 {Lift} = require "../comp/Lift"
+{Target} = require "../comp/Target"
 
 handle = {}
 
@@ -36,7 +37,7 @@ run = (world, engine) ->
   for ent in ents
     removeEntity.push ent
     mode = helper.getGameMode()
-    handle[mode]?(world, ent.playerInput.event)
+    handle[mode](world, ent.playerInput.event)
   # remove all player input from the world
   for removeMe in removeEntity
     world.removeEntity removeMe
@@ -75,8 +76,6 @@ handle[GameMode.MESSAGES] = (world, event) ->
 
 handle[GameMode.PLAY] = (world, event) ->
   switch event.vk
-    when "VK_SLASH"
-      helper.setGameMode GameMode.HELP
     when "VK_L"
       helper.setGameMode GameMode.LOOK
     when "VK_M"
@@ -85,8 +84,36 @@ handle[GameMode.PLAY] = (world, event) ->
       y = Math.max 0, log.length-DISPLAY_SIZE.HEIGHT+2
       helper.setCamera 0, y, 0
       helper.setGameMode GameMode.MESSAGES
+    when "VK_SLASH"
+      helper.setGameMode GameMode.HELP
+    when "VK_T"
+      helper.setGameMode GameMode.TARGET
     else
       handlePlay world, event.vk
+
+handle[GameMode.TARGET] = (world, event) ->
+  switch event.vk
+    when "VK_ESCAPE", "VK_Q", "VK_X"
+      {position} = helper.getPlayer()
+      {x, y, z} = position
+      helper.setCamera x, y, z
+      helper.setGameMode GameMode.PLAY
+    when "VK_RETURN", "VK_SPACE"
+      player = helper.getPlayer()
+      {camera} = helper.getCamera()
+      ents = helper.getEntsAt camera
+      for ent in ents
+        if ent.health?
+          world.addComponent player, "target", new Target ent
+          break
+      if ents.length is 0
+        world.removeComponent player, "target"
+      {position} = helper.getPlayer()
+      {x, y, z} = position
+      helper.setCamera x, y, z
+      helper.setGameMode GameMode.PLAY
+    else
+      handleLook world, event.vk
 
 #----------------------------------------------------------------------
 
@@ -125,11 +152,25 @@ handleMessages = (world, vk) ->
 handlePlay = (world, vk) ->
   ent = helper.getPlayer()
   switch vk
-    when "VK_UP", "VK_DOWN", "VK_LEFT", "VK_RIGHT", "VK_SPACE"
-      handlePlayMove world, vk, ent
-      helper.tick()
     when "VK_U"
       handlePlayUse world, vk, ent
+      helper.tick()
+    # sure would be nice to capture all these movement keys in a single
+    # array instead of spreading them out over so many when cases
+    when "VK_HOME", "VK_UP", "VK_PAGE_UP", "VK_LEFT", "VK_CLEAR"
+      handlePlayMove world, vk, ent
+      helper.tick()
+    when "VK_RIGHT", "VK_END", "VK_DOWN", "VK_PAGE_DOWN", "VK_SPACE"
+      handlePlayMove world, vk, ent
+      helper.tick()
+    when "VK_NUMPAD7", "VK_NUMPAD8", "VK_NUMPAD9", "VK_NUMPAD4"
+      handlePlayMove world, vk, ent
+      helper.tick()
+    when "VK_NUMPAD5", "VK_NUMPAD6", "VK_NUMPAD1", "VK_NUMPAD2"
+      handlePlayMove world, vk, ent
+      helper.tick()
+    when "VK_NUMPAD3"
+      handlePlayMove world, vk, ent
       helper.tick()
     else
       helper.addMessage "DEBUG: Unknown key #{vk}"
@@ -144,21 +185,37 @@ handlePlayMove = (world, vk, ent) ->
   dy = y
   dz = z
   switch vk
-    when "VK_UP"
+    when "VK_HOME", "VK_NUMPAD7"
+      dx--
+      dy--
+      msg = "You move northwest."
+    when "VK_UP", "VK_NUMPAD8"
       dy--
       msg = "You move north."
-    when "VK_DOWN"
-      dy++
-      msg = "You move south."
-    when "VK_LEFT"
+    when "VK_PAGE_UP", "VK_NUMPAD9"
+      dx++
+      dy--
+      msg = "You move northeast."
+    when "VK_LEFT", "VK_NUMPAD4"
       dx--
       msg = "You move west."
-    when "VK_RIGHT"
-      dx++
-      msg = "You move east."
-    when "VK_SPACE"
+    when "VK_CLEAR", "VK_SPACE", "VK_NUMPAD5"
       helper.addMessage "You pass."
       return
+    when "VK_RIGHT", "VK_NUMPAD6"
+      dx++
+      msg = "You move east."
+    when "VK_END", "VK_NUMPAD1"
+      dx--
+      dy++
+      msg = "You move southwest."
+    when "VK_DOWN", "VK_NUMPAD2"
+      dy++
+      msg = "You move south."
+    when "VK_PAGE_DOWN", "VK_NUMPAD3"
+      dx++
+      dy++
+      msg = "You move southeast."
   # is the destination walkable?
   walk = helper.isWalkable dx, dy, dz
   if walk.ok
@@ -222,8 +279,8 @@ handlePlayUse = (world, vk, playerEnt) ->
   # update game state
   helper.addMessage msg if msg?
 
-class exports.PhysicsSystem extends System
+class exports.PlayerThinkSystem extends System
   act: -> run @world, @engine
 
 #----------------------------------------------------------------------
-# end of PhysicsSystem.coffee
+# end of PlayerThinkSystem.coffee
