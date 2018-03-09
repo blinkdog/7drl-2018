@@ -33,7 +33,8 @@ run = (world, engine) ->
   ents = world.find "alien"
   for ent in ents
     # dead aliens don't think
-    continue if ent.corspe?
+    continue if ent.corpse?
+    continue if ent.health.hp < 1
 
     # if an alien has a target
     if ent.target?
@@ -75,7 +76,7 @@ chaseTarget = (world, ent) ->
   dz = ent.target.ent.position.z
   # we can chase through any passable
   passableCallback = (x,y) ->
-    walk = helper.isWalkable x, y, sz
+    walk = helper.isSeeable x, y, sz
     return walk.ok
   # compute a path from the alien
   dijkstra = new ROT.Path.Dijkstra sx, sy, passableCallback
@@ -116,16 +117,36 @@ chaseOrAttackTarget = (world, ent) ->
     chaseTarget world, ent
 
 millAbout = (ent) ->
+  # if this alien is a lift user
+  if ent.liftUser?
+    liftEnt = helper.isStandingOnLift ent
+    if (liftEnt?) and (ROT.RNG.getUniform() < 0.5)
+      lx = liftEnt.position.x
+      ly = liftEnt.position.y
+      lz = liftEnt.position.z
+      ent.position.x = lx
+      ent.position.y = ly
+      ent.position.z = lz
+      return
+  # otherwise, pick a random position around us
   {x,y,z} = ent.position
   x-- if ROT.RNG.getUniform() < 0.5
   x++ if ROT.RNG.getUniform() < 0.5
   y-- if ROT.RNG.getUniform() < 0.5
   y++ if ROT.RNG.getUniform() < 0.5
   walk = helper.isWalkable x,y,z
+  # if we can walk there
   if walk.ok
     ent.position.x = x
     ent.position.y = y
     ent.position.z = z
+  else
+    # otherwise, check if it's a door we can open
+    if walk.ent?
+      if (walk.ent.door?) and (ent.doorUser?)
+        # open the damn door
+        walk.ent.door.openingAfter = helper.getTick()
+        return
 
 class exports.AlienThinkSystem extends System
   act: -> run @world, @engine

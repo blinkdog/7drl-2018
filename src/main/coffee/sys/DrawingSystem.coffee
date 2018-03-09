@@ -26,6 +26,7 @@ helper = require "../helper"
 
 display = null
 draw = {}
+lastHp = 100
 
 run = (world, engine) ->
   # first, ensure that we've got a display
@@ -251,7 +252,7 @@ drawStatusLine = (world, camera) ->
         STATUS_MSG = "%b{#777}%c{#000}[Message Log] #{y+1}/#{log.length}"
       when GameMode.PLAY
         STATUS_MSG = "%b{#777}%c{#000}[#{name}] "
-        STATUS_MSG += "%b{#700}%c{#000}" if hp < oldHP
+        STATUS_MSG += "%b{#700}%c{#000}" if hp < lastHp
         STATUS_MSG += "HP:#{hp}"
         STATUS_MSG += "%b{#777}%c{#000} Level:#{z} (#{x},#{y})"
     display.drawText 0, STATUS_Y, STATUS_MSG
@@ -261,8 +262,8 @@ drawStatusLine = (world, camera) ->
     HELP_MSG = "" if mode is GameMode.LOSE
     HELP_MSG = "[X] Exit Message Log" if mode is GameMode.MESSAGES
     display.drawText DISPLAY_SIZE.WIDTH-(HELP_MSG.length+1), STATUS_Y, "%b{#777}%c{#000}#{HELP_MSG}"
-    # update our last health indicator
-    ent.oldHealth.hp = ent.health.hp
+    # record the last hit point total we rendered
+    lastHp = hp
 
 drawWalls = (world, camera) ->
   # find the view frustum in camera space

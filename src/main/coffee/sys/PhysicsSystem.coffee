@@ -157,7 +157,8 @@ handlePlayMove = (world, vk, ent) ->
       dx++
       msg = "You move east."
     when "VK_SPACE"
-      msg = "You pass."
+      helper.addMessage "You pass."
+      return
   # is the destination walkable?
   walk = helper.isWalkable dx, dy, dz
   if walk.ok
@@ -170,7 +171,10 @@ handlePlayMove = (world, vk, ent) ->
         walk.ent.door.openingAfter = helper.getTick() + 1
         msg = null
       else if walk.ent.obstacle?
-        msg = "The obstacle blocks your path."
+        if walk.ent.name?
+          msg = "#{walk.ent.name.name} blocks your path."
+        else
+          msg = "The obstacle blocks your path."
       else
         msg = "You can't move that way."
     else

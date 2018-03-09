@@ -19,6 +19,7 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 * 083: Attacking Aliens
 * 070: Observed and hidden messages
 * 068: Reworked main loop to fix timing problem
+* 058: Attacking/Fleeing Station Crew; Alien/Crew Door and Lift Use
 
 ## Thanks
 * Darius Kazemi for [Corpora](https://github.com/dariusk/corpora); names from census data

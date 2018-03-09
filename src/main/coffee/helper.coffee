@@ -73,7 +73,7 @@ exports.canCoordsSee = (sx, sy, sz, dx, dy, dz) ->
   return false if dz isnt sz
   # now we do fov calculations
   lightPasses = (x,y) ->
-    walk = exports.isWalkable x, y, sz
+    walk = exports.isSeeable x, y, sz
     return walk.ok
   fov = new ROT.FOV.PreciseShadowcasting lightPasses
   seen = false
@@ -219,13 +219,13 @@ exports.haveDoorAt = (dx, dy, dz) ->
       return true
   return false
 
-exports.isWalkable = (wx, wy, wz) ->
+exports.isSeeable = (wx, wy, wz) ->
   # see if anything is blocking
   ents = world.find [ "obstacle", "position" ]
   for ent in ents
-    continue if ent.alien?  # aliens don't block themselves
-    continue if ent.crew?   # crew don't block themselves
-    continue if ent.player? # the player doesn't block themselves
+    continue if ent.alien?  # aliens don't block LOS
+    continue if ent.crew?   # crew don't block LOS
+    continue if ent.player? # the player doesn't block LOS
     {x,y,z} = ent.position
     if (x is wx) and (y is wy) and (z is wz)
       return
@@ -240,16 +240,55 @@ exports.isWalkable = (wx, wy, wz) ->
       return
         ok: open
         ent: ent
-  # next look for corridors
-  ents = world.find "corridor"
+  # next look for areas (rooms and corridors)
+  ents = world.find "area"
   for ent in ents
     {x1, y1, x2, y2, z} = ent.area
     if (wx >= x1) and (wx <= x2) and (wy >= y1) and (wy <= y2) and (wz is z)
       return
         ok: true
         ent: ent
-  # next look for rooms
-  ents = world.find "room"
+  # nothing allows us to walk there
+  return
+    ok: false
+    ent: null
+
+exports.isStandingOnLift = (ent) ->
+  return null if not ent.position?
+  {x,y,z} = ent.position
+  # look for lifts
+  ents = world.find "lift"
+  for liftEnt in ent
+    lx = liftEnt.position.x
+    ly = liftEnt.position.y
+    lz = liftEnt.position.z
+    if (lx is x) and (ly is y) and (lz is z)
+      return liftEnt
+  return null
+
+exports.isWalkable = (wx, wy, wz) ->
+  # see if anything is blocking
+  ents = world.find [ "obstacle", "position" ]
+  for ent in ents
+    # continue if ent.alien?  # aliens don't block themselves
+    # continue if ent.crew?   # crew don't block themselves
+    # continue if ent.player? # the player doesn't block themselves
+    {x,y,z} = ent.position
+    if (x is wx) and (y is wy) and (z is wz)
+      return
+        ok: false
+        ent: ent
+  # next look for doors
+  ents = world.find "door"
+  for ent in ents
+    {x,y,z} = ent.position
+    {open} = ent.door
+    if (x is wx) and (y is wy) and (z is wz)
+      return
+        ok: open
+        ent: ent
+  # next look for areas (rooms and corridors)
+  ents = world.find "area"
   for ent in ents
     {x1, y1, x2, y2, z} = ent.area
     if (wx >= x1) and (wx <= x2) and (wy >= y1) and (wy <= y2) and (wz is z)

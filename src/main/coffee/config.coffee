@@ -21,7 +21,7 @@ exports.DEBUG =
   # all messages are observed, not just the ones in player view
   OMNISCIENT: true
   # some glyphs are replaced with unicode glyphs
-  UNICODE: true
+  UNICODE: false
 
 exports.DISPLAY_SIZE =
   WIDTH: 80
@@ -54,12 +54,22 @@ exports.WALL =
   FG: "#777"
   BG: "#111"
 
-exports.NUM_ALIENS = exports.STATION_SIZE.LEVELS*2
-
-exports.NUM_CREW = exports.STATION_SIZE.LEVELS
-
 if exports.DEBUG.UNICODE
   exports.DOOR.CLOSED.CH = "\uD83D\uDEAA"
+
+exports.ALIEN =
+  DOOR_USE: 0.2
+  LIFT_USE: 0.1
+  #MAX_FLOOR: exports.STATION_SIZE.LEVELS-2
+  MAX_FLOOR: exports.STATION_SIZE.LEVELS
+  MIN_FLOOR: 1
+  NUM_PRESENT: exports.STATION_SIZE.LEVELS*2
+
+exports.CREW =
+  MAX_FLOOR: exports.STATION_SIZE.LEVELS
+  #MIN_FLOOR: 2
+  MIN_FLOOR: 1
+  NUM_PRESENT: exports.STATION_SIZE.LEVELS
 
 #----------------------------------------------------------------------
 # end of config.coffee

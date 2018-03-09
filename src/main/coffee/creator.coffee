@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{DOOR, NUM_ALIENS, NUM_CREW, STATION_SIZE} = require "./config"
+{ALIEN, CREW, DOOR, STATION_SIZE} = require "./config"
 
 helper = require "./helper"
 
@@ -27,6 +27,7 @@ helper = require "./helper"
 {Corridor} = require "./comp/Corridor"
 {Crew} = require "./comp/Crew"
 {Door} = require "./comp/Door"
+{DoorUser} = require "./comp/DoorUser"
 {Room} = require "./comp/Room"
 {GameClock} = require "./comp/GameClock"
 {GameMode} = require "./comp/GameMode"
@@ -34,7 +35,9 @@ helper = require "./helper"
 {Health} = require "./comp/Health"
 {Lift} = require "./comp/Lift"
 {LiftRoom} = require "./comp/LiftRoom"
+{LiftUser} = require "./comp/LiftUser"
 {Messages} = require "./comp/Messages"
+{MindStats} = require "./comp/MindStats"
 {Name} = require "./comp/Name"
 {Obstacle} = require "./comp/Obstacle"
 {OldHealth} = require "./comp/OldHealth"
@@ -83,7 +86,8 @@ addLiftToLevel = (world, level, dir) ->
 build = (world, spec) ->
   ent = world.createEntity()
   for key of spec
-    world.addComponent ent, key, spec[key]
+    if spec[key]?
+      world.addComponent ent, key, spec[key]
   return ent
 
 rollAlienCombatStats = ->
@@ -97,6 +101,12 @@ rollCrewCombatStats = ->
   defense = 40 + ROT.RNG.getUniformInt -10, 10
   strength = 30 + ROT.RNG.getUniformInt -5, 5
   return new CombatStats attack, defense, strength
+
+rollCrewMindStats = ->
+  bravery = 50 + ROT.RNG.getUniformInt -30, 30
+  intelligence = 50 + ROT.RNG.getUniformInt -30, 30
+  mood = MindStats.CALM
+  return new MindStats bravery, intelligence, mood
 
 exports.create = (world) ->
   # create our game
@@ -203,11 +213,9 @@ exports.create = (world) ->
     addLiftToLevel world, i, Lift.DOWN
 
   # create station crew members
-  for i in [1..NUM_CREW]
-    # pick a floor not the top or bottom
-    #cz = ROT.RNG.getUniformInt 2, STATION_SIZE.LEVELS-1
-    # DEBUG: pick any floor
-    cz = ROT.RNG.getUniformInt 1, STATION_SIZE.LEVELS
+  for i in [1..CREW.NUM_PRESENT]
+    # pick a floor for the crew member
+    cz = ROT.RNG.getUniformInt CREW.MIN_FLOOR, CREW.MAX_FLOOR
     roomEnt = helper.getRoomOnLevel cz
     # find a spot within the room
     {area} = roomEnt
@@ -217,29 +225,39 @@ exports.create = (world) ->
     build world,
       combatStats: rollCrewCombatStats()
       crew: new Crew()
+      doorUser: new DoorUser()
       glyph: new Glyph "C", "#77a", "#000"
       health: new Health()
+      liftUser: new LiftUser()
+      mindStats: rollCrewMindStats()
       name: new Name helper.getRandomName()
       obstacle: new Obstacle()
       position: new Position cx, cy, cz
 
   # create aliens
-  for i in [1..NUM_ALIENS]
-    # pick a floor not the bottom 2
-    #cz = ROT.RNG.getUniformInt 1, STATION_SIZE.LEVELS-2
-    # DEBUG: pick any floor
-    cz = ROT.RNG.getUniformInt 1, STATION_SIZE.LEVELS
+  for i in [1..ALIEN.NUM_PRESENT]
+    # pick a floor for the alien
+    cz = ROT.RNG.getUniformInt ALIEN.MIN_FLOOR, ALIEN.MAX_FLOOR
     roomEnt = helper.getRoomOnLevel cz
     # find a spot within the room
     {area} = roomEnt
     cx = ROT.RNG.getUniformInt area.x1, area.x2
     cy = ROT.RNG.getUniformInt area.y1, area.y2
+    # see if this alien likes to use doors or lifts
+    doorUser = null
+    liftUser = null
+    if ROT.RNG.getUniform() < ALIEN.DOOR_USE
+      doorUser = new DoorUser()
+    if ROT.RNG.getUniform() < ALIEN.LIFT_USE
+      liftUser = new LiftUser()
     # create an alien there
     build world,
       alien: new Alien()
       combatStats: rollAlienCombatStats()
+      doorUser: doorUser
       glyph: new Glyph "S", "#696", "#000"
       health: new Health()
+      liftUser: liftUser
       name: new Name "Alien"
       obstacle: new Obstacle()
       position: new Position cx, cy, cz

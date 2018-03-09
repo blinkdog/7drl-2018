@@ -7,9 +7,11 @@ A roadmap for working on the project
 * [X] Attacking Aliens
 * [X] Observed Messages (addMessageAt -> canPlayerSee x,y)
 * [X] Main Loop / Input Queue Timing Bug
-* [ ] Following/Defending Station Crew
-  * [ ] Crew members opening doors
-  * [ ] (Some) aliens opening doors
+* [X] Attacking/Fleeing Station Crew
+  * [X] Crew members opening doors
+  * [X] (Some) aliens opening doors
+  * [X] Crew members using lifts
+  * [X] (Some) aliens using lifts
 * [ ] Look/Take/Drop/Use Items
 * [ ] Method to destroy The Alien Ship
 * [ ] LOS+FOW

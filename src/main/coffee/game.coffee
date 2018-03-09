@@ -66,10 +66,5 @@ exports.run = ->
   # run the main loop
   engine.start()
 
-# debugging in browser
-exports.engine = engine
-exports.world = world
-window.API.game = exports if window?.API?
-
 #----------------------------------------------------------------------
 # end of game.coffee

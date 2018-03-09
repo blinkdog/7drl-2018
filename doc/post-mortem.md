@@ -83,3 +83,9 @@ Twice I've coded this pattern:
 It looks like index-ecs is missing two calls:
 - remove all components of type X
 - remove all entities having component X
+
+## Double down on fine-grained attributes
+Some of the helper stuff could probably be simplified with
+attributes like "BlocksMovement", "BlocksLineOfSight",
+"StandingInDoorway", "StandingOnLift", "StandingNextToDoor",
+"BottomFloor", "TopFloor", etc...

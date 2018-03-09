@@ -19,6 +19,8 @@ helper = require "../helper"
 
 {System} = require "./System"
 
+{OldHealth} = require "../comp/OldHealth"
+
 lastTick = 0
 
 run = (world, engine) ->
@@ -52,9 +54,7 @@ run = (world, engine) ->
       if ROT.RNG.getPercentage() > dcs.defense
         # inflict damage on the defender
         dmg = Math.floor(ROT.RNG.getUniform() * acs.strength)+1
-        targetEnt.health.hp -= dmg
-        targetEnt.health.hurt += dmg
-        helper.addMessageAt ax, ay, az, "#{ent.name.name} inflicts #{dmg} points of damage on #{targetEnt.name.name}"
+        inflictDamage world, ent, targetEnt, dmg
       else
         helper.addMessageAt ax, ay, az, "#{targetEnt.name.name} narrowly avoids the attack by #{ent.name.name}."
     else
@@ -64,6 +64,21 @@ run = (world, engine) ->
   # remove the attacking component from all entities
   for ent in stopAttacking
     world.removeComponent ent, "attacking"
+
+inflictDamage = (world, ent, targetEnt, dmg) ->
+  ax = ent.position.x
+  ay = ent.position.y
+  az = ent.position.z
+  # if they don't have a previous health component
+  if not targetEnt.oldHealth?
+    world.addComponent targetEnt, "oldHealth", new OldHealth()
+  # record their old hit points before we inflict damage
+  targetEnt.oldHealth.hp = targetEnt.health.hp
+  # now inflict damage upon them
+  targetEnt.health.hp -= dmg
+  targetEnt.health.hurt += dmg
+  # send a message if the player can see the damage inflicted
+  helper.addMessageAt ax, ay, az, "#{ent.name.name} inflicts #{dmg} points of damage on #{targetEnt.name.name}"
 
 class exports.CombatSystem extends System
   act: -> run @world, @engine
