@@ -258,28 +258,30 @@ drawStatusLine = (world, camera) ->
   switch mode
     when GameMode.HELP
       STATUS_MSG += "[Help] "
-      STATUS_MSG += "[Target:#{targetEnt.name.name}] " if targetEnt?
-      STATUS_MSG += "HP:#{hp} Level:#{z} (#{x},#{y})"
+      STATUS_MSG += "Target:#{targetEnt.name.name} (#{targetEnt.health.hp}) " if targetEnt?
+      STATUS_MSG += "X:#{x} Y:#{y} Level:#{z}"
     when GameMode.LOOK
       observed = helper.getNameAt getCamera()
       STATUS_MSG += "[Look] "
-      STATUS_MSG += "[Target:#{targetEnt.name.name}] " if targetEnt?
-      STATUS_MSG += "HP:#{hp} Level:#{z} (#{x},#{y}) #{observed}"
+      STATUS_MSG += "Target:#{targetEnt.name.name} (#{targetEnt.health.hp}) " if targetEnt?
+      STATUS_MSG += "X:#{x} Y:#{y} Level:#{z} "
+      STATUS_MSG += "#{observed}"
     when GameMode.LOSE
-      STATUS_MSG += "[#{name}] DEAD Level:#{z} (#{x},#{y})"
+      STATUS_MSG += "#{name} (DEAD) X:#{x} Y:#{y} Level:#{z}"
     when GameMode.MESSAGES
       {log} = helper.getMessages().messages
       STATUS_MSG += "[Message Log] #{y+1}/#{log.length}"
     when GameMode.PLAY
-      STATUS_MSG += "[#{name}] "
-      STATUS_MSG += "[Target:#{targetEnt.name.name}] " if targetEnt?
+      STATUS_MSG += "#{name} ("
       STATUS_MSG += "%b{#700}%c{#000}" if hp < lastHp
-      STATUS_MSG += "HP:#{hp}"
-      STATUS_MSG += "%b{#777}%c{#000} Level:#{z} (#{x},#{y})"
+      STATUS_MSG += "#{hp}"
+      STATUS_MSG += "%b{#777}%c{#000}) "
+      STATUS_MSG += "Target:#{targetEnt.name.name} (#{targetEnt.health.hp}) " if targetEnt?
+      STATUS_MSG += "X:#{x} Y:#{y} Level:#{z}"
     when GameMode.TARGET
       observed = helper.getNameAt getCamera()
       STATUS_MSG += "[Target] "
-      STATUS_MSG += "[Current:#{targetEnt.name.name}] " if targetEnt?
+      STATUS_MSG += "Current:#{targetEnt.name.name} (#{targetEnt.health.hp}) " if targetEnt?
       STATUS_MSG += "Cursor:#{observed}"
     else
       STATUS_MSG += "[#{mode}] ERROR: UNKNOWN GAME MODE"

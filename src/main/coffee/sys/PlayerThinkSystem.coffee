@@ -21,6 +21,7 @@ helper = require "../helper"
 
 {System} = require "./System"
 
+{Attacking} = require "../comp/Attacking"
 {GameMode} = require "../comp/GameMode"
 {Lift} = require "../comp/Lift"
 {Target} = require "../comp/Target"
@@ -102,11 +103,14 @@ handle[GameMode.TARGET] = (world, event) ->
       player = helper.getPlayer()
       {camera} = helper.getCamera()
       ents = helper.getEntsAt camera
+      targetEnt = null
       for ent in ents
         if ent.health?
-          world.addComponent player, "target", new Target ent
+          targetEnt = ent
           break
-      if ents.length is 0
+      if targetEnt?
+        world.addComponent player, "target", new Target targetEnt
+      else
         world.removeComponent player, "target"
       {position} = helper.getPlayer()
       {x, y, z} = position
@@ -152,6 +156,9 @@ handleMessages = (world, vk) ->
 handlePlay = (world, vk) ->
   ent = helper.getPlayer()
   switch vk
+    when "VK_A"
+      ok = handlePlayAttack world, vk, ent
+      helper.tick() if ok
     when "VK_U"
       handlePlayUse world, vk, ent
       helper.tick()
@@ -175,6 +182,24 @@ handlePlay = (world, vk) ->
     else
       helper.addMessage "DEBUG: Unknown key #{vk}"
   helper.setCamera ent.position.x, ent.position.y, ent.position.z
+
+handlePlayAttack = (world, vk, ent) ->
+  # if we don't have a target to attack
+  if not ent.target?
+    helper.addMessage "You haven't selected a target to attack!"
+    return false
+  # if the target is already dead
+  if ent.target.ent.corpse?
+    helper.addMessage "Your target is already dead."
+    return false
+  # if the target isn't standing next to us
+  adajcent = helper.areEntitiesAdjacent ent, ent.target.ent
+  if not adajcent
+    helper.addMessage "You must move closer in order to attack!"
+    return false
+  # it's go time, pal!
+  world.addComponent ent, "attacking", new Attacking()
+  return true
 
 handlePlayMove = (world, vk, ent) ->
   msg = null

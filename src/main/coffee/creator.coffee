@@ -176,7 +176,8 @@ exports.create = (world) ->
 
   # add a message to the world about our protagonist
   {name} = helper.getPlayer()
-  helper.addMessage "I am #{name.name}, station cargo handler."
+  #helper.addMessage "I am #{name.name}, station cargo handler."
+  helper.addMessage "I am station cargo handler #{name.name}."
 
   # create our camera
   {position} = helper.getPlayer()

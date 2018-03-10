@@ -22,11 +22,5 @@ describe "tda616", ->
     false.should.equal false
     true.should.equal true
 
-  it "should play some sound effects sometimes", ->
-    playAmbienceEffects = ->
-      audio.play "crash-large"
-      # TODO: This timeout can be handled with Promises; do that instead
-      setTimeout (-> audio.play "martian-scanner"), 5000
-
 #----------------------------------------------------------------------
 # end of tda616-test.coffee

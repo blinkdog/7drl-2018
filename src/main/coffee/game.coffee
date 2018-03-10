@@ -17,7 +17,6 @@
 
 {World} = require "index-ecs"
 
-audio = require "./audio"
 creator = require "./creator"
 helper = require "./helper"
 

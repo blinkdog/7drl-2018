@@ -15,11 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-audio = require "./audio"
 game = require "./game"
 
 exports.run = ->
-  loaded = await audio.loadResources()
   game.run()
 
 #----------------------------------------------------------------------

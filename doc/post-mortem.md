@@ -94,3 +94,18 @@ attributes like "BlocksMovement", "BlocksLineOfSight",
 Why Camera has its own set of x,y,z instead of being a
 marker interface for an entity that also has a Position?
 Bah... the folly of youth.
+
+## Entity vs Property
+The code is pretty picky when it comes to passing an
+entity or the specific property. It might be nice to
+have a "you know what I meant, pick the thing you
+want to examine from the entity that I just passed you"
+
+## Looking Back
+When this 7DRL started, I was picking out sound effects.
+Now I'm removing them from this commit. I don't have
+enough time to flesh out the audio system, and other
+features are more compelling.
+
+It's a good thing I followed the Roguebasin 15 step guide
+this time around.

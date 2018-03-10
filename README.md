@@ -21,10 +21,10 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 * 068: Reworked main loop to fix timing problem
 * 058: Attacking/Fleeing Station Crew; Alien/Crew Door and Lift Use
 * 040: Add Targeting Mode for Player
+* 023: Add Attack command for Player
 
 ## Thanks
 * Darius Kazemi for [Corpora](https://github.com/dariusk/corpora); names from census data
-* Mike Koenig for [Martian Scanner](http://soundbible.com/878-Martian-Scanner.html) sound effect
 
 ## License
 7drl-2018  

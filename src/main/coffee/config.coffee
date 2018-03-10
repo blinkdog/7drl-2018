@@ -19,7 +19,7 @@ exports.DEBUG =
   # This just hurts the player until they die; don't enable!
   FLOODED_WITH_RADIATION: false
   # all messages are observed, not just the ones in player view
-  OMNISCIENT: true
+  OMNISCIENT: false
   # some glyphs are replaced with unicode glyphs
   UNICODE: false
 
