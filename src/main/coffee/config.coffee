@@ -27,6 +27,8 @@ exports.DISPLAY_SIZE =
   WIDTH: 80
   HEIGHT: 30
 
+exports.DETONATION_TICKS = 10
+
 exports.DOOR =
   CLOSED:
     CH: "Z"
@@ -70,6 +72,8 @@ exports.CREW =
   MAX_FLOOR: exports.STATION_SIZE.LEVELS
   MIN_FLOOR: 2
   NUM_PRESENT: exports.STATION_SIZE.LEVELS
+
+exports.INVENTORY_HEIGHT = exports.MESSAGE_HEIGHT + 2
 
 exports.ITEM =
   MAX_FLOOR: exports.STATION_SIZE.LEVELS

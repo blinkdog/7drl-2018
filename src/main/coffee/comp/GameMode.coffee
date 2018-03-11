@@ -20,6 +20,7 @@ class exports.GameMode
     @mode = "Play" if not @mode?
 
   @HELP = "Help"             # looking at the help screen for commands
+  @INVENTORY = "Inventory"   # reviewing inventory to drop/take/use items
   @LOOK = "Look"             # using the look command to examine the map
   @LOSE = "Lose"             # the player has lost the game
   @MESSAGES = "Messages"     # reviewing the log of game messages

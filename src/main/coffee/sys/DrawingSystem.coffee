@@ -15,8 +15,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{DISPLAY_SIZE, MESSAGE_HEIGHT, WALL} = require "../config"
-{COMMAND_LIST, PLOT_SYNOPSIS, TITLE} = require "../story"
+{
+  DISPLAY_SIZE,
+  INVENTORY_HEIGHT,
+  MESSAGE_HEIGHT,
+  WALL
+} = require "../config"
+
+{
+  COMMAND_LIST,
+  PLOT_SYNOPSIS,
+  TITLE
+} = require "../story"
 
 helper = require "../helper"
 
@@ -47,6 +57,15 @@ draw[GameMode.HELP] = (world) ->
   drawMessages world, camera
   drawStatusLine world, camera
 
+draw[GameMode.INVENTORY] = (world) ->
+  # get the position of the camera
+  camera = getCamera()
+  # draw the inventory display
+  display.clear()
+  drawInventory world, camera
+  drawMessages world, camera
+  drawStatusLine world, camera
+
 draw[GameMode.LOOK] = (world) ->
   # get the position of the camera
   camera = getCamera()
@@ -65,12 +84,12 @@ draw[GameMode.LOOK] = (world) ->
 draw[GameMode.MESSAGES] = (world) ->
   # get the position of the camera
   camera = getCamera()
-  # draw the help display
+  # draw the messages display
   display.clear()
   drawMessageLog world, camera
   drawStatusLine world, camera
 
-draw[GameMode.PLAY] = draw[GameMode.LOSE] = (world) ->
+draw[GameMode.PLAY] = (world) ->
   # get the position of the camera
   camera = getCamera()
   # draw everything that needs to be drawn
@@ -99,6 +118,11 @@ draw[GameMode.TARGET] = (world) ->
   # return something reasonable to the caller
   return true
 
+# it doesn't matter if you win or lose, it's how you
+# play the game...
+draw[GameMode.LOSE] = draw[GameMode.PLAY]
+draw[GameMode.WIN] = draw[GameMode.PLAY]
+
 #----------------------------------------------------------------------
 
 clearLine = (y, bg) ->
@@ -125,6 +149,85 @@ drawDebugPattern = ->
   for y in [0...DISPLAY_SIZE.HEIGHT]
     for x in [0...DISPLAY_SIZE.WIDTH]
       display.draw x, y, "#", "#f0f", "#000"
+
+drawInventory = (world, camera) ->
+  # this is the list of interactable items
+  itemList = []
+  # get the player
+  player = helper.getPlayer()
+  # get the inventory entity
+  invEnt = player.inventory
+  delete invEnt.lookingAt # HACK: remove any previous lookingAt
+  # add those items to the list
+  for item in invEnt.items
+    itemList.push item
+  # find the player's position
+  {position} = player
+  # find all the entities at the player's position
+  ents = helper.getEntsAt position
+  for ent in ents
+    # add any items to the list
+    if ent.item?
+      itemList.push ent
+  # if there is nothing in the list
+  emptyList = (itemList.length is 0)
+  if emptyList
+    # add a nothing placeholder item
+    itemList.push
+      name:
+        name: "Nothing"
+  # sort the list
+  itemList.sort (a,b) ->
+    # player items first, floor items last
+    if (a.position?) and (not b.position?)
+      return 1
+    if (b.position?) and (not a.position?)
+      return -1
+    # in those sub-groups, sort by name
+    if (a.name.name < b.name.name)
+      return -1
+    if (b.name.name < a.name.name)
+      return 1
+    # roughly the same item
+    return 0
+  # find the camera's position
+  camPos = getCamera()
+  cy = camPos.y
+  # clamp the cursor position to the array size
+  cy = Math.max cy, 0                   # no less than 0
+  cy = Math.min cy, itemList.length-1   # no more than the list
+  # HACK: another ugly drawing code updates world state hack
+  # set the camera to the clamped cursor position
+  camPos.y = cy
+  # measure the width of the list
+  listWidth = 0
+  for item in itemList
+    if item.name?
+      nameWidth = item.name.name.length
+      listWidth = Math.max listWidth, item.name.name.length
+  # display the items
+  for y in [0...itemList.length]
+    item = itemList[y]
+    bg = "#000"
+    bg = "#777" if y is cy
+    attr = "%b{#000}%c{#777}"
+    attr = "%b{#777}%c{#000}" if y is cy
+    clearLine INVENTORY_HEIGHT+y, bg
+    display.drawText 5, INVENTORY_HEIGHT+y, "#{attr}#{item.name.name}"
+    # if we don't have an empty list
+    if not emptyList
+      # if this item is on the floor
+      if item.position?
+        # mark it as such
+        display.drawText 7+listWidth, INVENTORY_HEIGHT+y, "#{attr}(On Floor)"
+      # HACK: wow, this is super ugly, having the drawing code update
+      #       some hidden state in the player entity
+      # if the list isn't empty, and we're rendering the cursor
+      if y is cy
+        # update the player's inventory component to contain a
+        # reference to the item the cursor is currently upon
+        # (yeah, sorry, my skin is crawling too)
+        invEnt.lookingAt = item
 
 drawLookDot = (world, camera) ->
   frustum = translatePtoL DISPLAY_SIZE, camera
@@ -213,6 +316,8 @@ drawObjects = (world, camera) ->
   frustum = translatePtoL DISPLAY_SIZE, camera
   # find everything that we can draw
   ents = world.find [ "glyph", "position" ]
+  # slice the original array so that we can sort it
+  ents = ents.slice 0
   # sort them according to some broad criteria
   ents.sort (a, b) ->
     # always draw the player last
@@ -232,6 +337,10 @@ drawObjects = (world, camera) ->
     return 1 if b.door?
   # for each entity, draw it
   for ent in ents
+    if not ent.position?
+      console.log "ERROR: we asked for position entities and got one without!"
+      console.log "#{require("util").inspect ent}"
+      continue
     {glyph, position} = ent
     continue if position.z isnt camera.z
     # draw everything that we can draw
@@ -260,6 +369,8 @@ drawStatusLine = (world, camera) ->
       STATUS_MSG += "[Help] "
       STATUS_MSG += "Target:#{targetEnt.name.name} (#{targetEnt.health.hp}) " if targetEnt?
       STATUS_MSG += "X:#{x} Y:#{y} Level:#{z}"
+    when GameMode.INVENTORY
+      STATUS_MSG += "[Inventory] Enter to Drop/Take - Space to Use"
     when GameMode.LOOK
       observed = helper.getNameAt getCamera()
       STATUS_MSG += "[Look] "
@@ -283,15 +394,19 @@ drawStatusLine = (world, camera) ->
       STATUS_MSG += "[Target] "
       STATUS_MSG += "Current:#{targetEnt.name.name} (#{targetEnt.health.hp}) " if targetEnt?
       STATUS_MSG += "Cursor:#{observed}"
+    when GameMode.WIN
+      STATUS_MSG += "[WIN] #{name} has saved the human race!"
     else
-      STATUS_MSG += "[#{mode}] ERROR: UNKNOWN GAME MODE"
+      STATUS_MSG += "[#{mode}]"
   display.drawText 0, STATUS_Y, STATUS_MSG
   HELP_MSG = "[?] Help"
   HELP_MSG = "[X] Exit Help" if mode is GameMode.HELP
+  HELP_MSG = "[X] Exit Inventory" if mode is GameMode.INVENTORY
   HELP_MSG = "[X] Exit Look" if mode is GameMode.LOOK
   HELP_MSG = "" if mode is GameMode.LOSE
   HELP_MSG = "[X] Exit Message Log" if mode is GameMode.MESSAGES
   HELP_MSG = "[X] Exit Targeting" if mode is GameMode.TARGET
+  HELP_MSG = "" if mode is GameMode.WIN
   display.drawText DISPLAY_SIZE.WIDTH-(HELP_MSG.length+1), STATUS_Y, "%b{#777}%c{#000}#{HELP_MSG}"
   # record the last hit point total we rendered
   lastHp = hp

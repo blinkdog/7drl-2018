@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{DISPLAY_SIZE, STATION_SIZE} = require "../config"
+{DETONATION_TICKS, DISPLAY_SIZE, STATION_SIZE} = require "../config"
 
 helper = require "../helper"
 
@@ -24,6 +24,7 @@ helper = require "../helper"
 {Attacking} = require "../comp/Attacking"
 {GameMode} = require "../comp/GameMode"
 {Lift} = require "../comp/Lift"
+{Position} = require "../comp/Position"
 {Target} = require "../comp/Target"
 
 handle = {}
@@ -53,6 +54,16 @@ handle[GameMode.HELP] = (world, event) ->
     else
       helper.addMessage "Unknown key #{event.vk}: Press ESC or X to exit Help mode."
 
+handle[GameMode.INVENTORY] = (world, event) ->
+  switch event.vk
+    when "VK_ESCAPE", "VK_Q", "VK_X"
+      {position} = helper.getPlayer()
+      {x, y, z} = position
+      helper.setCamera x, y, z
+      helper.setGameMode GameMode.PLAY
+    else
+      handleInventory world, event.vk
+
 handle[GameMode.LOOK] = (world, event) ->
   switch event.vk
     when "VK_ESCAPE", "VK_Q", "VK_X"
@@ -77,6 +88,9 @@ handle[GameMode.MESSAGES] = (world, event) ->
 
 handle[GameMode.PLAY] = (world, event) ->
   switch event.vk
+    when "VK_I"
+      helper.setCamera 0, 0, 0
+      helper.setGameMode GameMode.INVENTORY
     when "VK_L"
       helper.setGameMode GameMode.LOOK
     when "VK_M"
@@ -119,7 +133,75 @@ handle[GameMode.TARGET] = (world, event) ->
     else
       handleLook world, event.vk
 
+handle[GameMode.WIN] = (world, event) ->
+
 #----------------------------------------------------------------------
+
+handleInventory = (world, vk) ->
+  {camera} = helper.getCamera()
+  {x, y, z} = camera
+  # modify camera position
+  # HACK: the drawing code does the clamping; ugh
+  switch vk
+    when "VK_UP"
+      y--
+    when "VK_DOWN"
+      y++
+    when "VK_RETURN"
+      handleInventoryDropTake world
+    when "VK_SPACE", "VK_U"
+      handleInventoryUse world
+  # set new camera position
+  helper.setCamera x, y, z
+
+handleInventoryDropTake = (world) ->
+  player = helper.getPlayer()
+  {inventory} = player
+  {lookingAt} = inventory
+  # if we're not looking at anything
+  if not lookingAt?
+    helper.addMessage "You don't know how to take that."
+    return
+  # if the item is on the ground
+  if lookingAt.position?
+    # put the item into the player's inventory
+    inventory.items.push lookingAt
+    # and remove its position in the world
+    world.removeComponent lookingAt, "position"
+    # tell the player about it
+    helper.addMessage "You take the #{lookingAt.name.name}."
+    return
+  # otherwise, remove the item from the player's inventory
+  inventory.items = inventory.items.filter (x) ->
+    return x isnt lookingAt
+  # and give it a position in the world
+  {x,y,z} = player.position
+  itemPosEnt = new Position x, y, z
+  world.addComponent lookingAt, "position", itemPosEnt
+  # tell the player about it
+  helper.addMessage "You drop the #{lookingAt.name.name}."
+
+handleInventoryUse = (world) ->
+  player = helper.getPlayer()
+  {inventory} = player
+  {lookingAt} = inventory
+  # if we're not looking at anything
+  if not lookingAt?
+    helper.addMessage "You don't know how to use that."
+    return
+  # if we're looking at the High Explosives
+  if lookingAt.highExplosives?
+    if not lookingAt.highExplosives.detonateAfter?
+      # set them to explode
+      lookingAt.highExplosives.detonateAfter = helper.getTick() + DETONATION_TICKS
+      helper.addMessage "The High Explosives will detonate in #{DETONATION_TICKS} seconds..."
+      return
+    else
+      # remind the player that they've already set them to explode
+      helper.addMessage "The High Explosives are already set to explode."
+      return
+  # otherwise, it's just a red herring
+  helper.addMessage "You make a note to put the #{lookingAt.name.name} into the station's Lost and Found."
 
 handleLook = (world, vk) ->
   {camera} = helper.getCamera()

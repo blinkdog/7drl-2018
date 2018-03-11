@@ -29,6 +29,8 @@ run = (world, engine) ->
   for ent in ents
     # skip them if they're already dead
     continue if ent.corpse?
+    # skip them if they are inanimate
+    continue if ent.item?
     # if their health dipped below zero
     {hp} = ent.health
     ax = ent.position.x

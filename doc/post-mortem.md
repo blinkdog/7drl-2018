@@ -109,3 +109,45 @@ features are more compelling.
 
 It's a good thing I followed the Roguebasin 15 step guide
 this time around.
+
+## Entity sorting
+This is a component that I missed early on; if I would
+have given things a "height", it would have been easy to
+z-sort them for the display routines.
+
+Closed doors would have full height, open doors would
+have zero height.
+
+Yes, this would have been much better than the scattered
+one-off functions around the codebase.
+
+## Implicit entity sorting
+This looks to be kind of a nasty problem in ECS design.
+I've got a bunch of item entities, but what is the
+canonical way they should be ordered? And where does
+that code go, maybe into helper?
+
+Because I'm running out of time, the canonical ordering
+is in the drawing system, and it updates the game state
+so that my input handling routines can operate on the
+proper item.
+
+An ugly hack; it's got to have a better solution.
+
+## Understanding Node.js EventEmitter
+This shows up in the console.
+
+  MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 "component-added" listeners added. Use emitter.setMaxListeners() to increase limit.
+  MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 "component-removed" listeners added. Use emitter.setMaxListeners() to increase limit.
+  MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 "entity-removed" listeners added. Use emitter.setMaxListeners() to increase limit.
+
+This isn't a hard limit though.
+
+## index-ecs returning internal arrays?
+Do I need to slice them before returning them?
+Yes, it would appear that I do need to do this.
+
+## LOL
+While searching for High Explosives to test, I used the look
+mode to scan around and look at the items. Once, I saw a giraffe
+and wondered, "WTF is a giraffe doing on this space station?"

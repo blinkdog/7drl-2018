@@ -124,15 +124,15 @@ pickItemRoom = ->
   return roomEnt
 
 rollAlienCombatStats = ->
-  attack = 50 + ROT.RNG.getUniformInt -20, 20
-  defense = 30 + ROT.RNG.getUniformInt -10, 10
-  strength = 50 + ROT.RNG.getUniformInt -20, 20
+  attack = 50 + ROT.RNG.getUniformInt -20, 5
+  defense = 30 + ROT.RNG.getUniformInt -20, 5
+  strength = 5 + ROT.RNG.getUniformInt 0, 5
   return new CombatStats attack, defense, strength
 
 rollCrewCombatStats = ->
-  attack = 50 + ROT.RNG.getUniformInt -20, 20
-  defense = 40 + ROT.RNG.getUniformInt -10, 10
-  strength = 30 + ROT.RNG.getUniformInt -5, 5
+  attack = 50 + ROT.RNG.getUniformInt 0, 10
+  defense = 30 + ROT.RNG.getUniformInt 0, 10
+  strength = 20 + ROT.RNG.getUniformInt 0, 10
   return new CombatStats attack, defense, strength
 
 rollCrewMindStats = ->
@@ -313,6 +313,7 @@ exports.create = (world) ->
     itemEnt = build world,
       glyph: new Glyph "q", "#966", "#000"
       health: new Health()
+      item: new Item()
       name: new Name itemSpec.name
       position: new Position cx, cy, cz
     # not all items needs it, and the type key is dynamic, so

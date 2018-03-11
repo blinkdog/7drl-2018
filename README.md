@@ -23,6 +23,7 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 * 040: Add Targeting Mode for Player
 * 023: Add Attack command for Player
 * 016: Add Items to the map
+* 010: Take/Drop/Use Items; Game is now winnable
 
 ## Thanks
 * Darius Kazemi for [Corpora](https://github.com/dariusk/corpora)

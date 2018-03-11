@@ -26,6 +26,7 @@ helper = require "./helper"
 {CrewThinkSystem} = require "./sys/CrewThinkSystem"
 {DoorSystem} = require "./sys/DoorSystem"
 {DrawingSystem} = require "./sys/DrawingSystem"
+{ExplosivesSystem} = require "./sys/ExplosivesSystem"
 {InputSystem} = require "./sys/InputSystem"
 {PlayerThinkSystem} = require "./sys/PlayerThinkSystem"
 {RadiationSystem} = require "./sys/RadiationSystem"
@@ -59,6 +60,7 @@ exports.run = ->
   scheduler.add new CrewThinkSystem(world, engine), true
   scheduler.add new AlienThinkSystem(world, engine), true
   scheduler.add new DoorSystem(world, engine), true
+  scheduler.add new ExplosivesSystem(world, engine), true
   scheduler.add new RadiationSystem(world, engine), true
   scheduler.add new CombatSystem(world, engine), true
   scheduler.add new CorpseSystem(world, engine), true
