@@ -22,9 +22,11 @@ My entry for Seven Day Roguelike (7DRL) Challenge 2018
 * 058: Attacking/Fleeing Station Crew; Alien/Crew Door and Lift Use
 * 040: Add Targeting Mode for Player
 * 023: Add Attack command for Player
+* 016: Add Items to the map
 
 ## Thanks
-* Darius Kazemi for [Corpora](https://github.com/dariusk/corpora); names from census data
+* Darius Kazemi for [Corpora](https://github.com/dariusk/corpora)
+  * Names of clothing, household objects, and people (census data)
 
 ## License
 7drl-2018  

@@ -54,21 +54,26 @@ exports.WALL =
   FG: "#777"
   BG: "#111"
 
+#----------------------------------------------------------------------
+
 if exports.DEBUG.UNICODE
   exports.DOOR.CLOSED.CH = "\uD83D\uDEAA"
 
 exports.ALIEN =
   DOOR_USE: 0.2
   LIFT_USE: 0.1
-  #MAX_FLOOR: exports.STATION_SIZE.LEVELS-2
-  MAX_FLOOR: exports.STATION_SIZE.LEVELS
+  MAX_FLOOR: exports.STATION_SIZE.LEVELS-2
   MIN_FLOOR: 1
   NUM_PRESENT: exports.STATION_SIZE.LEVELS*2
 
 exports.CREW =
   MAX_FLOOR: exports.STATION_SIZE.LEVELS
-  #MIN_FLOOR: 2
-  MIN_FLOOR: 1
+  MIN_FLOOR: 2
+  NUM_PRESENT: exports.STATION_SIZE.LEVELS
+
+exports.ITEM =
+  MAX_FLOOR: exports.STATION_SIZE.LEVELS
+  MIN_FLOOR: exports.STATION_SIZE.LEVELS-2
   NUM_PRESENT: exports.STATION_SIZE.LEVELS
 
 #----------------------------------------------------------------------

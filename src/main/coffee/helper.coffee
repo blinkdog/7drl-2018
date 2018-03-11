@@ -185,10 +185,18 @@ exports.getPlayer = ->
     return ent
   return null
 
-exports.getRandomName = (x, y, z) ->
+exports.getRandomClothing = ->
+  {clothes} = require "../data/clothing"
+  return "#{clothes.random()}"
+
+exports.getRandomName = ->
   {firstNames} = require "../data/firstNames"
   {lastNames} = require "../data/lastNames"
   return "#{firstNames.random()} #{lastNames.random()}"
+
+exports.getRandomObject = ->
+  {objects} = require "../data/objects"
+  return "#{objects.random()}"
 
 exports.getRoomOnLevel = (z) ->
   ents = world.find [ "area", "room" ]

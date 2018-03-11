@@ -2,7 +2,6 @@
 A roadmap for working on the project
 
 ## Planned Features
-* [X] Observed Messages (addMessageAt -> canPlayerSee x,y)
 * [X] Main Loop / Input Queue Timing Bug
 * [X] Attacking/Fleeing Station Crew
   * [X] Crew members opening doors
@@ -11,19 +10,19 @@ A roadmap for working on the project
   * [X] (Some) aliens using lifts
 * [X] Add Targeting Mode for Player
 * [X] Add Attack command for Player
-* [ ] Look/Take/Drop/Use Items
+* [X] Add Items to the map / Look at Items
+* [ ] Take/Drop/Use Items
 * [ ] Method to destroy The Alien Ship
 * [ ] LOS+FOW
 * [ ] Map Key
 * [ ] Weapons
 * [ ] Healing Items
 * [ ] Aliens Shapeshifted into Station Crew
+* [ ] Murderer component for players who kill crew
 * [ ] Environmentals
   * [ ] Room/Corridor Temperature
   * [ ] Room/Corridor Oxygen
   * [ ] Room/Corridor Radiation
 * [ ] Environmental survival items
 * [ ] Spreading environmentals through open doors
-
-## Wishlist
 * [ ] Schrödinger's Items

@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #----------------------------------------------------------------------
 
-{ALIEN, CREW, DOOR, STATION_SIZE} = require "./config"
+{ALIEN, CREW, DOOR, ITEM, STATION_SIZE} = require "./config"
 
 helper = require "./helper"
 
@@ -33,6 +33,9 @@ helper = require "./helper"
 {GameMode} = require "./comp/GameMode"
 {Glyph} = require "./comp/Glyph"
 {Health} = require "./comp/Health"
+{HighExplosives} = require "./comp/HighExplosives"
+{Inventory} = require "./comp/Inventory"
+{Item} = require "./comp/Item"
 {Lift} = require "./comp/Lift"
 {LiftRoom} = require "./comp/LiftRoom"
 {LiftUser} = require "./comp/LiftUser"
@@ -89,6 +92,36 @@ build = (world, spec) ->
     if spec[key]?
       world.addComponent ent, key, spec[key]
   return ent
+
+createHighExplosives = ->
+  return
+    name: "High Explosives"
+    type: "highExplosives"
+    comp: new HighExplosives()
+
+createRandomItem = (index) ->
+  return createHighExplosives() if index is 1
+  name = "Useless Junk"
+  if ROT.RNG.getUniform() < 0.5
+    name = helper.getRandomClothing()
+  else
+    name = helper.getRandomObject()
+  return
+    name: name
+
+pickItemRoom = ->
+  # until we find a room we like
+  roomEnt = null
+  while not roomEnt?
+    # pick a floor for the item
+    z = ROT.RNG.getUniformInt ITEM.MIN_FLOOR, ITEM.MAX_FLOOR
+    # choose a random room on that level
+    roomEnt = helper.getRoomOnLevel z
+    # veto all lift rooms and the final room
+    if (roomEnt.liftRoom?) or (roomEnt.liftRoom?)
+      roomEnt = null
+  # return the chosen room to the caller
+  return roomEnt
 
 rollAlienCombatStats = ->
   attack = 50 + ROT.RNG.getUniformInt -20, 20
@@ -168,6 +201,7 @@ exports.create = (world) ->
     crew: new Crew()
     glyph: new Glyph "@"
     health: new Health()
+    inventory: new Inventory()
     name: new Name helper.getRandomName()
     obstacle: new Obstacle()
     oldHealth: new OldHealth()
@@ -229,6 +263,7 @@ exports.create = (world) ->
       doorUser: new DoorUser()
       glyph: new Glyph "C", "#77a", "#000"
       health: new Health()
+      inventory: new Inventory()
       liftUser: new LiftUser()
       mindStats: rollCrewMindStats()
       name: new Name helper.getRandomName()
@@ -262,6 +297,29 @@ exports.create = (world) ->
       name: new Name "Alien"
       obstacle: new Obstacle()
       position: new Position cx, cy, cz
+
+  # create items
+  for i in [1..ITEM.NUM_PRESENT]
+    # pick a room to put the item in
+    roomEnt = pickItemRoom()
+    # find a spot within the room
+    {area} = roomEnt
+    cx = ROT.RNG.getUniformInt area.x1, area.x2
+    cy = ROT.RNG.getUniformInt area.y1, area.y2
+    cz = area.z
+    # create an item type
+    itemSpec = createRandomItem i
+    # create an item there
+    itemEnt = build world,
+      glyph: new Glyph "q", "#966", "#000"
+      health: new Health()
+      name: new Name itemSpec.name
+      position: new Position cx, cy, cz
+    # not all items needs it, and the type key is dynamic, so
+    # rather than complicate the above builder pattern, we'll
+    # just add the dynamic key after the fact if necessary
+    if itemSpec.type?
+      world.addComponent itemEnt, itemSpec.type, itemSpec.comp
 
 #----------------------------------------------------------------------
 # end of creator.coffee
