@@ -71,7 +71,6 @@ draw[GameMode.LOOK] = (world) ->
   camera = getCamera()
   # draw everything that needs to be drawn
   display.clear()
-  #drawDebugPattern()
   drawWalls world, camera
   drawMap world, camera
   drawObjects world, camera
@@ -94,7 +93,6 @@ draw[GameMode.PLAY] = (world) ->
   camera = getCamera()
   # draw everything that needs to be drawn
   display.clear()
-  #drawDebugPattern()
   drawWalls world, camera
   drawMap world, camera
   drawObjects world, camera
@@ -143,12 +141,6 @@ createDisplay = (world) ->
   document.body.appendChild display.getContainer()
   # return something reasonable to the caller
   return display
-
-# DEBUG: Fill the grid with magic pink hashes
-drawDebugPattern = ->
-  for y in [0...DISPLAY_SIZE.HEIGHT]
-    for x in [0...DISPLAY_SIZE.WIDTH]
-      display.draw x, y, "#", "#f0f", "#000"
 
 drawInventory = (world, camera) ->
   # this is the list of interactable items

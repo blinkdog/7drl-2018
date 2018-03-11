@@ -62,9 +62,11 @@ coverage = (next) ->
       next?()
 
 tar = (next) ->
-  exec "tar cvzf tda616-#{project.version}.tar.gz tda616.html tda616.css tda616.js img js sfx", (err, stdout, stderr) ->
+  exec "tar cvzf tda616-#{project.version}.tar.gz index.html tda616.css tda616.js js", (err, stdout, stderr) ->
     throw err if err
-    next?()
+    exec "zip tda616-#{project.version}.zip index.html tda616.css tda616.js js/rot.min.js", (err, stdout, stderr) ->
+      throw err if err
+      next?()
 
 test = (next) ->
   exec "node_modules/.bin/mocha --colors --recursive", (err, stdout, stderr) ->

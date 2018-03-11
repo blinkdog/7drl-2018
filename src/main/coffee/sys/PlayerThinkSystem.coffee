@@ -52,7 +52,7 @@ handle[GameMode.HELP] = (world, event) ->
       helper.setCamera x, y, z
       helper.setGameMode GameMode.PLAY
     else
-      helper.addMessage "Unknown key #{event.vk}: Press ESC or X to exit Help mode."
+      helper.addMessage "Press ESC or Q or X to exit Help mode."
 
 handle[GameMode.INVENTORY] = (world, event) ->
   switch event.vk
@@ -261,8 +261,6 @@ handlePlay = (world, vk) ->
     when "VK_NUMPAD3"
       handlePlayMove world, vk, ent
       helper.tick()
-    else
-      helper.addMessage "DEBUG: Unknown key #{vk}"
   helper.setCamera ent.position.x, ent.position.y, ent.position.z
 
 handlePlayAttack = (world, vk, ent) ->
