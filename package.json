@@ -1,7 +1,7 @@
 {
   "name": "tda616",
-  "version": "1.0.0",
-  "author": "Patrick Meade <veloxi@ticon.net>",
+  "version": "1.0.1",
+  "author": "Patrick Meade <blinkdog@protonmail.com>",
   "description": "Seven Day Roguelike (7DRL) Challenge 2018",
   "scripts": {
     "start": "google-chrome --new-tab index.html"
@@ -22,14 +22,14 @@
     "rot.js"
   ],
   "dependencies": {
-    "index-ecs": "1.0.0"
+    "index-ecs": "1.1.0"
   },
   "devDependencies": {
-    "browserify": "16.1.1",
-    "coffeescript": "2.2.2",
+    "browserify": "16.2.3",
+    "coffeescript": "2.3.2",
     "istanbul": "0.4.5",
-    "mocha": "5.0.4",
-    "should": "13.2.1"
+    "mocha": "5.2.0",
+    "should": "13.2.3"
   },
   "license": "AGPL-3.0"
 }
